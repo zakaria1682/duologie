@@ -31,10 +31,10 @@ for i in range(0, max_y + 2):
 
     grid.append(row)
 
-
+# Add chips to grid
 for chip in chips:
     chip_x, chip_y = (int(chip[1]), int(chip[2]))
-    print(chip_x, chip_y)
+    # print(chip_x, chip_y)
 
     grid[max_y - chip_y + 1][chip_x] = int(chip[0])
 
