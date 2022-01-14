@@ -28,13 +28,20 @@ class board:
         self.cost = 0
 
 
-# read data of csv file input
+# read chip data of csv file input
 with open("gates&netlists/chip_0/print_0.csv") as input:
-    data = [line for line in csv.reader(input)]
+    chip_data = [line for line in csv.reader(input)]
 
 # Skip header first line for chips data, and turn chip data into ints
-chips = [list(map(int, chip)) for chip in data[1:]]
+chips = [list(map(int, chip)) for chip in chip_data[1:]]
 
+
+# read net data of csv file input
+with open("gates&netlists/chip_0/netlist_1.csv") as input:
+    netlist_data = [line for line in csv.reader(input)]
+
+# Skip header first line for chips data, and turn chip data into ints
+nets = [list(map(int, net)) for net in netlist_data[1:]]
 
 bord1 = board(chips)
 
