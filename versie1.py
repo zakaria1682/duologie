@@ -34,6 +34,14 @@ print("Bord lengte: ", bord1.length)
 print("")
 
 
+class net:
+    def __init__(self):
+        self.wires = []
+        start = 0
+        destination = 0 
+        cost
+
+
 def print_board(board):
     for y in range(board.length - 1, -1, -1):
         row = []
