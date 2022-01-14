@@ -54,17 +54,3 @@ def print_board(board):
 
 
 print_board(bord1)
-
-        
-
-
-
-
-
-
-
-
-
-
-
-
