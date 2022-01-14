@@ -1,5 +1,33 @@
 import csv
 
+class net:
+    def __init__(self, start, destination):
+        self.wires = []
+        self.start = start
+        self.destination = destination
+        cost = 0
+
+class board:
+    def __init__(self, chips):
+        # Get max x and y values of outermost chips
+        max_x, max_y = (0, 0)
+        for coordinates in chips:
+            x = coordinates[1]
+            y = coordinates[2]
+            if x > max_x:
+                max_x = x
+            if y > max_y:
+                max_y = y
+        
+        # set board dimensions according to max x & y
+        # x & y + 2 to create extra ring of space around chip configuration
+        self.width = max_x + 2
+        self.length = max_y + 2
+        self.chips = chips
+        self.nets = []
+        self.cost = 0
+
+
 # read data of csv file input
 with open("gates&netlists/chip_0/print_0.csv") as input:
     data = [line for line in csv.reader(input)]
@@ -7,39 +35,12 @@ with open("gates&netlists/chip_0/print_0.csv") as input:
 # Skip header first line for chips data, and turn chip data into ints
 chips = [list(map(int, chip)) for chip in data[1:]]
 
-max_x = 0
-max_y = 0
 
-# Get max x and y values of outermost chips
-for coordinates in chips:
-    x = int(coordinates[1])
-    y = int(coordinates[2])
-    if x > max_x:
-        max_x = x
-    if y > max_y:
-        max_y = y
-
-class bord:
-    def __init__(self, chips, nets, width, length):
-        self.length = length
-        self.width = width
-        self.chips = chips
-        self.nets = nets
-        self.cost = 0
-
-bord1 = bord(chips, [], 8, 7)
+bord1 = board(chips)
 
 print("Bord breedte: ", bord1.width)
 print("Bord lengte: ", bord1.length)
 print("")
-
-
-class net:
-    def __init__(self):
-        self.wires = []
-        start = 0
-        destination = 0 
-        cost
 
 
 def print_board(board):
@@ -62,3 +63,5 @@ def print_board(board):
 
 
 print_board(bord1)
+
+
