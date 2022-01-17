@@ -1,3 +1,20 @@
 Cost bepalen
     tellen van wires + intersections
     tijdens het maken van nets/achteraf van het bord/allebei?
+
+
+Make_net functie gaat nu paden zoeken tot een bepaalde lengte (nu "i").
+Checkt nu wanneer paden uitkomen op dest.
+Voor bijvoorbeeld 10 iteraties geeft de functie alle paden naar dest
+van lengte tot en met 10 wires (deze komen in winning_paths).
+Deze zijn echter (nog) niet allemaal nodig.
+Waarschijnlijk moet de functie zo worden omgeschreven dat hij het eerstvolgende
+correcte pad geeft:
+Neem een correct pad van de eerste gate in kwestie naar de tweede. Vervolgens ga
+je voor dit correcte pad kijken of er ook correcte paden voor de overige gates
+gemaakt kunnen worden. Kan dit ergens niet? ga dan 1 stap terug naar een vorige 
+gate en zoek een nieuw (volgend) correct pad.
+
+Dus waarschijnlijk een functie:
+    give_next_correct_path
+    /give_next_correct_net

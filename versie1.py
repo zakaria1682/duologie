@@ -55,6 +55,8 @@ def read_data(chip_number, netlist_number):
 
 gates, netlist = read_data(chip_number, netlist_number)
 
+print("Netlist: ", netlist)
+
 bord1 = board(gates)
 
 print("Bord breedte: ", bord1.width)
@@ -97,8 +99,9 @@ def make_net(board, loc, dest):
     print("De paden die hieruit volgen: ")
     moving_possible = True
     i = 0
+    winning_paths = []
     while moving_possible == True:
-        if i > 1:
+        if i > 6:
             break
 
         new_paths = []
@@ -114,16 +117,27 @@ def make_net(board, loc, dest):
             for move in moves:
                 if move != False:
                     new_path = path + [move]
-                    new_paths.append(new_path)
+                    
+                    # Check if path is a path to destination
+                    if move == dest:
+                        # print("Found path to destination")
+                        winning_paths.append(new_path)
+                    else:
+                        new_paths.append(new_path)
 
         if new_paths == hypothetical_paths:
             moving_possible = False
 
-        print(new_paths)
+        # print(new_paths)
 
         hypothetical_paths = [] + new_paths
 
         i += 1
+    
+    # Paths leading to dest(ination)
+    print("\nPaths to ", dest, ": ")
+    for path in winning_paths:
+        print(path)
 
 
 # Returns possible moves that can be taken from end of path.
@@ -159,6 +173,21 @@ def get_moves(board, path, origin):
     else:
         west = False
     # print("West: ", west)
+
+    # prevent path from visiting already visted coordinates
+    for coord in path:
+        if coord == north:
+            # print("coord ", coord, "already visited")
+            north = False
+        if coord == east:
+            # print("coord ", coord, "already visited")
+            east = False
+        if coord == south:
+            # print("coord ", coord, "already visited")
+            south = False
+        if coord == west:
+            # print("coord ", coord, "already visited")
+            west = False
 
     return north, east, south, west
 
