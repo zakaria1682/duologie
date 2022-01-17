@@ -183,6 +183,8 @@ def get_origin(path):
 make_net(bord1, (gates[0][1], gates[0][2]), (6, 5))
 
 
+# Hardcode voorbeeld om te kijken of de onderstaande functie wel goed nets van
+# een bord kan printen.
 bord1.nets[(1, 2)] = [(1,5),(2,5),(3,5),(4,5),(5,5),(6,5)]
 
 # Function that gives a text output of a solution (board) as prescribed in

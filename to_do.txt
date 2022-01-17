@@ -1,0 +1,3 @@
+Cost bepalen
+    tellen van wires + intersections
+    tijdens het maken van nets/achteraf van het bord/allebei?
