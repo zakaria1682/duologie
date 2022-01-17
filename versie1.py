@@ -1,5 +1,8 @@
 import csv
 
+chip_number = 0
+netlist_number = 1
+
 class net:
     def __init__(self, start, destination):
         self.wires = []
@@ -8,10 +11,10 @@ class net:
         cost = 0
 
 class board:
-    def __init__(self, chips):
+    def __init__(self, gates):
         # Get max x and y values of outermost chips
         max_x, max_y = (0, 0)
-        for coordinates in chips:
+        for coordinates in gates:
             x = coordinates[1]
             y = coordinates[2]
             if x > max_x:
@@ -23,27 +26,36 @@ class board:
         # x & y + 2 to create extra ring of space around chip configuration
         self.width = max_x + 2
         self.length = max_y + 2
-        self.chips = chips
-        self.nets = []
+        self.gates = gates
+        self.nets = {}
         self.cost = 0
 
 
 # read chip data of csv file input
-with open("gates&netlists/chip_0/print_0.csv") as input:
-    chip_data = [line for line in csv.reader(input)]
+# Function reads the coordinates of the gates on the print, and the netlist
+# for which a viable net configuration has to be found.
+def read_data(chip_number, netlist_number):
+    ch = str(chip_number)
+    nn = str(netlist_number)
 
-# Skip header first line for chips data, and turn chip data into ints
-chips = [list(map(int, chip)) for chip in chip_data[1:]]
+    print_filepath = "gates&netlists/chip_" + ch + "/print_" + ch + ".csv"
+    with open(print_filepath) as input:
+        gate_data = [line for line in csv.reader(input)]
+
+    gates = [list(map(int, chip)) for chip in gate_data[1:]]
+
+    netlist_filepath = "gates&netlists/chip_" + ch + "/netlist_" + nn + ".csv"
+    with open(netlist_filepath) as input:
+        netlist_data = [line for line in csv.reader(input)]
+    
+    netlist = [tuple(map(int, net)) for net in netlist_data[1:]]
+
+    return gates, netlist
 
 
-# read net data of csv file input
-with open("gates&netlists/chip_0/netlist_1.csv") as input:
-    netlist_data = [line for line in csv.reader(input)]
+gates, netlist = read_data(chip_number, netlist_number)
 
-# Skip header first line for chips data, and turn chip data into ints
-nets = [list(map(int, net)) for net in netlist_data[1:]]
-
-bord1 = board(chips)
+bord1 = board(gates)
 
 print("Bord breedte: ", bord1.width)
 print("Bord lengte: ", bord1.length)
@@ -58,10 +70,10 @@ def print_board(board):
         for x in range(0, board.width):
             al_geprint = False
 
-            for chip in board.chips:
+            for gate in board.gates:
                 
-                if (chip[1], chip[2]) == (x, y):
-                    print("", chip[0], "", end = '')
+                if (gate[1], gate[2]) == (x, y):
+                    print("", gate[0], "", end = '')
                     al_geprint = True
             
             if al_geprint == False:            
@@ -78,15 +90,15 @@ print_board(bord1)
 # Create a path on board from loc to dest
 # Branch from starting location and continue to branch to find paths to dest
 def make_net(board, loc, dest):
-    print("Starting location")
-    print(loc)
+    print("Starting location (de eerste net)")
+    print(loc, "\n")
     hypothetical_paths = [[loc]]
-    # print(hypothetical_paths)
 
+    print("De paden die hieruit volgen: ")
     moving_possible = True
     i = 0
     while moving_possible == True:
-        if i > 3:
+        if i > 1:
             break
 
         new_paths = []
@@ -168,6 +180,28 @@ def get_origin(path):
 
 
 
-make_net(bord1, (chips[0][1], chips[0][2]), (6, 5))
+make_net(bord1, (gates[0][1], gates[0][2]), (6, 5))
 
-# [(1, 5), (0, 5), (0, 4), (0, 3), (1, 3)]
+
+bord1.nets[(1, 2)] = [(1,5),(2,5),(3,5),(4,5),(5,5),(6,5)]
+
+# Function that gives a text output of a solution (board) as prescribed in
+# the assignment. 
+def output_board(board, netlist, chip_number, netlist_number):
+    print("net,wires")
+    for net in netlist:
+
+        net_as_string = str(net).replace(" ", "")
+        print("\"" + net_as_string + "\",\"", end = "")
+
+        if net in board.nets:
+            print(str(board.nets[net]).replace(" ", ""), end = '')
+        print("\"")
+
+    print("chip_" + str(chip_number) + "_net_" + str(netlist_number) + ","
+        + str(board.cost))
+
+    
+
+print("\nVoorgeschreven output")
+output_board(bord1, netlist, chip_number, netlist_number)
