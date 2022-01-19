@@ -18,3 +18,31 @@ gate en zoek een nieuw (volgend) correct pad.
 Dus waarschijnlijk een functie:
     give_next_correct_path
     /give_next_correct_net
+
+
+
+Gevallen dat coordinaten niet beloopbaar zijn, en de make_net function daar dus
+niet naar kan uitbreiden:
+    Als het coordinaat al in het hypothetische pad voorkomt (pad mag niet
+    cirkelen/zichzelf overlappen. Technisch gezien zou het wel mogelijk kunnen
+    zijn dat een net zichzelf kruist, maar zover ik me kan voorstellen is dit
+    absoluut nooit nuttig.)
+    Als het coordinaat een andere gate bevat (nets mogen niet over gates lopen).
+    Als het coordinaat al in de nets van het bord voorkomt EN het vorige
+    coordinaat ook (dan is er overlap. Intersectie mag wel.)
+
+
+Hoe kan er worden herkend als er eventueel een oplossing bestaat mèt een 
+intersectie die beter is dan een oplossing zonder intersectie? {aden die een
+intersectie maken laten wachten voor 300 stappen. Ze zijn namelijk pas relevant 
+als een alternatief méér dan 300 wires nodig heeft. Een oplossing met een
+intersectie toestaan, maar wel doorzoeken om te kijken of er een langer 
+alternatief (maar niet 300 wires langer) bestaat zonder intersectie. Deze 
+oplossingen geven echter niet het antwoord voor het opspelen van meer dan 1 
+intersectie.
+
+
+Gegeven nets. Moeten deze in volgorde worden gemaakt? 
+Zo niet, maak de nets tussen gates die het dichtst bij elkaar staan eerst. 
+Deze hebben de kleinste kans op in de weg te lopen voor andere nets en dus de 
+kleinste kans om geherstructureerd te worden.

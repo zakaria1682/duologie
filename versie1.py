@@ -1,3 +1,4 @@
+from sys import getallocatedblocks
 import matplotlib
 from matplotlib import pyplot as plt
 import numpy as np
@@ -17,16 +18,16 @@ class board:
     def __init__(self, gates):
         # Get max x and y values of outermost chips
         max_x, max_y = (0, 0)
-        for coordinates in gates:
-            x = coordinates[1]
-            y = coordinates[2]
+        for gate in gates:
+            x = gates[gate][0]
+            y = gates[gate][1]
             if x > max_x:
                 max_x = x
             if y > max_y:
                 max_y = y
         
         # set board dimensions according to max x & y
-        # x & y + 2 to create extra ring of space around chip configuration
+        # x & y + 2 to create extra ring of space around chip print
         self.width = max_x + 2
         self.length = max_y + 2
         self.gates = gates
@@ -45,7 +46,13 @@ def read_data(chip_number, netlist_number):
     with open(print_filepath) as input:
         gate_data = [line for line in csv.reader(input)]
 
-    gates = [list(map(int, chip)) for chip in gate_data[1:]]
+    gates = dict([(int(gatenum), (int(gate_x), int(gate_y))) 
+            for gatenum, gate_x, gate_y in gate_data[1:]])
+
+    gatelocations = set()
+
+    for gate in gates:
+        gatelocations.add(gates[gate])
 
     netlist_filepath = "gates&netlists/chip_" + ch + "/netlist_" + nn + ".csv"
     with open(netlist_filepath) as input:
@@ -53,12 +60,14 @@ def read_data(chip_number, netlist_number):
     
     netlist = [tuple(map(int, net)) for net in netlist_data[1:]]
 
-    return gates, netlist
+    return gates, gatelocations, netlist
 
 
-gates, netlist = read_data(chip_number, netlist_number)
+gates, gatelocations, netlist = read_data(chip_number, netlist_number)
 
 print("Netlist: ", netlist)
+print("Gates: ", gates)
+print("Gate locations: ", gatelocations)
 
 bord1 = board(gates)
 
@@ -66,46 +75,38 @@ print("Bord breedte: ", bord1.width)
 print("Bord lengte: ", bord1.length)
 print("")
 
+# Niet echt meer nodig als we een betere draw hebben
+# # Basic printing function to visualize board configuration
+# def print_board(board):
+#     for y in range(board.length - 1, -1, -1):
+#         row = []
 
-# Basic printing function to visualize board configuration
-def print_board(board):
-    for y in range(board.length - 1, -1, -1):
-        row = []
+#         for x in range(0, board.width):
+#             al_geprint = False
 
-        for x in range(0, board.width):
-            al_geprint = False
-
-            for gate in board.gates:
+#             for gate in board.gates:
                 
-                if (gate[1], gate[2]) == (x, y):
-                    print("", gate[0], "", end = '')
-                    al_geprint = True
+#                 if (gate[1], gate[2]) == (x, y):
+#                     print("", gate[0], "", end = '')
+#                     al_geprint = True
             
-            if al_geprint == False:            
-                print(" + ", end = '')
+#             if al_geprint == False:            
+#                 print(" + ", end = '')
 
-        print("\n")
+#         print("\n")
 
+# print_board(bord1)
 
-print_board(bord1)
-
-# loc = (1, 5)
-# dest = (6, 5)
 
 # Create a path on board from loc to dest
 # Branch from starting location and continue to branch to find paths to dest
-def make_net(board, loc, dest):
-    print("Starting location (de eerste net)")
-    print(loc, "\n")
+def make_net(board, loc, dest, objectives):
+    print("Objective = moving from gate ", objectives[0][0], " to ", objectives[0][1])
+    print("Finding path from ", loc, " to ", dest, "...")
     hypothetical_paths = [[loc]]
 
-    print("De paden die hieruit volgen: ")
     moving_possible = True
-    i = 0
-    winning_paths = []
     while moving_possible == True:
-        if i > 6:
-            break
 
         new_paths = []
         for path in hypothetical_paths:
@@ -113,7 +114,6 @@ def make_net(board, loc, dest):
             # backtracking and getting stuck in a loop.
             origin = get_origin(path)
             moves = get_moves(board, path, origin)
-            moves[0]
 
             # For each spot found that can be moved to, add a new 
             # path (= old path + spot) to the collection of paths
@@ -122,27 +122,40 @@ def make_net(board, loc, dest):
                     new_path = path + [move]
                     
                     # Check if path is a path to destination
+                    # If more than one objective is left, start making net for
+                    # next objective. If not, the final path for current
+                    # configuration is found, so return the board.
                     if move == dest:
-                        # print("Found path to destination")
-                        winning_paths.append(new_path)
-                    else:
+                        board.nets[objectives[0]] = new_path
+                        print("found path: ")
+                        print(new_path)
+                        print("")
+
+                        if len(objectives) > 1:
+                            new_objective = objectives[1]
+                            new_location = board.gates[new_objective[0]]
+                            new_destination = board.gates[new_objective[1]]
+
+                            new_board = make_net(board, new_location, new_destination, objectives[1:])
+
+                            if new_board != False:
+                                return new_board
+                        else:
+                            return board
+                    # If path has not yet reached dest, continue moving.
+                    # Except if move is about to pass a gate
+                    elif move not in gatelocations:
                         new_paths.append(new_path)
 
         if new_paths == hypothetical_paths:
+            print("Found no new paths")
             moving_possible = False
 
-        # print(new_paths)
-
+        # update hypothetical paths
         hypothetical_paths = [] + new_paths
 
-        i += 1
-    
-    # Paths leading to dest(ination)
-    print("\nPaths to ", dest, ": ")
-    for path in winning_paths:
-        print(path)
-    
-    return winning_paths
+    # Moving is no longer possible
+    return False
 
 
 # Returns possible moves that can be taken from end of path.
@@ -194,6 +207,21 @@ def get_moves(board, path, origin):
             # print("coord ", coord, "already visited")
             west = False
 
+    # Prevent moves from entering coordinates already used by other nets in board
+    for net in board.nets:
+        # [1:-1] so it can still visit its destination gate even if that gate
+        # has been visited once before by another net.
+        existing_net = board.nets[net][1:-1]
+
+        if north in existing_net:
+            north = False
+        if east in existing_net:
+            east = False
+        if south in existing_net:
+            south = False
+        if west in existing_net:
+            west = False
+
     return north, east, south, west
 
 
@@ -214,7 +242,8 @@ def get_origin(path):
 
 
 
-make_net(bord1, (gates[0][1], gates[0][2]), (6, 5))
+test = make_net(bord1, (1, 5), (6, 5), netlist)
+print(test.nets)
 
 
 # Hardcode voorbeeld om te kijken of de onderstaande functie wel goed nets van
@@ -266,7 +295,7 @@ def draw(moves, gates):
     plt.savefig("moves/" + f"output.png")
 
 
-draw(make_net(bord1, (gates[0][1], gates[0][2]), (6, 5)), gates)
+# draw(make_net(bord1, (gates[0][1], gates[0][2]), (6, 5)), gates)
 
 
 # print("\nVoorgeschreven output")
