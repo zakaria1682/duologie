@@ -4,8 +4,8 @@ from matplotlib import pyplot as plt
 import numpy as np
 import csv
 
-chip_number = 0
-netlist_number = 1
+chip_number = 1
+netlist_number = 4
 
 class net:
     def __init__(self, start, destination):
@@ -75,6 +75,15 @@ print("Bord breedte: ", bord1.width)
 print("Bord lengte: ", bord1.length)
 print("")
 
+test_lijst = []
+test_lijst.append(bord1)
+bord1.nets[(1, 2)] = [1, 2, 3]
+test_lijst.append(bord1)
+
+print("Wat voor een copies?")
+for bord in test_lijst:
+    print(bord.nets)
+
 # Niet echt meer nodig als we een betere draw hebben
 # # Basic printing function to visualize board configuration
 # def print_board(board):
@@ -104,6 +113,7 @@ def make_net(board, loc, dest, objectives):
     print("Objective = moving from gate ", objectives[0][0], " to ", objectives[0][1])
     print("Finding path from ", loc, " to ", dest, "...")
     hypothetical_paths = [[loc]]
+    result_boards = []
 
     moving_possible = True
     while moving_possible == True:
@@ -141,7 +151,7 @@ def make_net(board, loc, dest, objectives):
                             if new_board != False:
                                 return new_board
                         else:
-                            return board
+                            result_boards.append(board)
                     # If path has not yet reached dest, continue moving.
                     # Except if move is about to pass a gate
                     elif move not in gatelocations:
