@@ -312,7 +312,7 @@ def draw(test, gates):
     
 
     # save file
-    plt.savefig("moves/" + f"output.png")
+    plt.savefig("output.png")
 
 
 draw(test, gates)
