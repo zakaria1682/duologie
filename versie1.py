@@ -2,6 +2,7 @@ from sys import getallocatedblocks
 import matplotlib
 from matplotlib import pyplot as plt
 import numpy as np
+import random
 import csv
 
 chip_number = 1
@@ -58,7 +59,7 @@ def read_data(chip_number, netlist_number):
     with open(netlist_filepath) as input:
         netlist_data = [line for line in csv.reader(input)]
     
-    netlist = [tuple(map(int, net)) for net in netlist_data[1:]]
+    netlist = random.shuffle([tuple(map(int, net)) for net in netlist_data[1:]])
 
     return gates, gatelocations, netlist
 
