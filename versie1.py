@@ -5,8 +5,8 @@ import numpy as np
 import random
 import csv
 
-chip_number = 1
-netlist_number = 4
+chip_number = 0
+netlist_number = 1
 
 class net:
     def __init__(self, start, destination):
@@ -59,7 +59,10 @@ def read_data(chip_number, netlist_number):
     with open(netlist_filepath) as input:
         netlist_data = [line for line in csv.reader(input)]
     
-    netlist = random.shuffle([tuple(map(int, net)) for net in netlist_data[1:]])
+    print("Netlist data: ")
+    print(netlist_data)
+
+    netlist = [tuple(map(int, net)) for net in netlist_data[1:]]
 
     return gates, gatelocations, netlist
 
@@ -70,20 +73,17 @@ print("Netlist: ", netlist)
 print("Gates: ", gates)
 print("Gate locations: ", gatelocations)
 
+random.shuffle(netlist)
+print("Netlist na shuffelen: ")
+print(netlist)
+
 bord1 = board(gates)
 
 print("Bord breedte: ", bord1.width)
 print("Bord lengte: ", bord1.length)
 print("")
 
-test_lijst = []
-test_lijst.append(bord1)
-bord1.nets[(1, 2)] = [1, 2, 3]
-test_lijst.append(bord1)
 
-print("Wat voor een copies?")
-for bord in test_lijst:
-    print(bord.nets)
 
 # Niet echt meer nodig als we een betere draw hebben
 # # Basic printing function to visualize board configuration
@@ -152,7 +152,7 @@ def make_net(board, loc, dest, objectives):
                             if new_board != False:
                                 return new_board
                         else:
-                            result_boards.append(board)
+                            return board
                     # If path has not yet reached dest, continue moving.
                     # Except if move is about to pass a gate
                     elif move not in gatelocations:
@@ -252,7 +252,7 @@ def get_origin(path):
         return False
 
 
-
+print(netlist)
 test = make_net(bord1, (1, 5), (6, 5), netlist)
 print(test.nets)
 
