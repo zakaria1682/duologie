@@ -308,7 +308,6 @@ def draw(test, gates):
         # if i%3 == 0:
         route[i] = np.array(route[i])
         plt.plot(route[i][0:len(route[i]), 0], route[i][0:len(route[i]), 1], marker = ' ') 
-        # plt.savefig("moves/" + f"output{i}.png")
     
 
     # save file
