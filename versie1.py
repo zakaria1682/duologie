@@ -252,9 +252,9 @@ def get_origin(path):
         return False
 
 
-print(netlist)
+# print(netlist)
 test = make_net(bord1, (1, 5), (6, 5), netlist)
-print(test.nets)
+# print(test.nets)
 
 
 # Hardcode voorbeeld om te kijken of de onderstaande functie wel goed nets van
@@ -279,35 +279,45 @@ def output_board(board, netlist, chip_number, netlist_number):
 
 
 # function that graphically displays the steps and saves the graphs to the move directory
-def draw(moves, gates):
+def draw(test, gates):
     route = []
-    print(moves)
-    # make array of arrays
-    for i in range(len(moves)):
-        for j in range(len(moves[0])):
-            route.append([moves[i][j][0], moves[i][j][1]])
+    net_dict = test.nets
+    print("net_dict", net_dict)
+    for i in range(len(netlist)):
+        route2 = []
+        for j in range(len(net_dict[netlist[i]])):
+            route2.append(list(net_dict[netlist[i]][j]))
+        route.append(route2)
     
+     
     # plot gates
-    gates = np.array(gates)
-    plt.scatter(gates[:, 1], gates[:, 2], marker = 's')
-    for i in range(0,5):
-        plt.text(gates[i, 1], gates[i, 2], str(i + 1), color="red", fontsize=14)
+    gates2 = []
+    for i in range(len(gates)):
+        gates2.append(gates[i + 1])
+        plt.text(list(gates2[i])[0], list(gates2[i])[1], str(i + 1), color="red", fontsize=14)
+    gates2 = np.array(gates2)
+    plt.scatter(gates2[:, 0], gates2[:, 1], marker = 's')
+
 
     # plot grid and routes 
-    route = np.array(route)
+    
     plt.grid()
-    for i in range(len(route)):
-        if i%3 == 0:
-            plt.plot(route[i:3 + i, 0], route[i:3 + i, 1], marker = ' ') 
-            # plt.savefig("moves/" + f"output{i}.png")
+
+    print("route: ", route)
+    for i in range(len(net_dict)):
+        # if i%3 == 0:
+        route[i] = np.array(route[i])
+        plt.plot(route[i][0:len(route[i]), 0], route[i][0:len(route[i]), 1], marker = ' ') 
+        # plt.savefig("moves/" + f"output{i}.png")
     
 
     # save file
     plt.savefig("moves/" + f"output.png")
 
 
-# draw(make_net(bord1, (gates[0][1], gates[0][2]), (6, 5)), gates)
+draw(test, gates)
 
 
 # print("\nVoorgeschreven output")
 # output_board(bord1, netlist, chip_number, netlist_number)
+
