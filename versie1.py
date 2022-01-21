@@ -1,9 +1,10 @@
 from sys import getallocatedblocks
-import matplotlib
-from matplotlib import pyplot as plt
 import numpy as np
 import random
 import csv
+
+from helper_functions import draw, score
+
 
 chip_number = 0
 netlist_number = 1
@@ -278,44 +279,12 @@ def output_board(board, netlist, chip_number, netlist_number):
         + str(board.cost))
 
 
-# function that graphically displays the steps and saves the graphs to the move directory
-def draw(board, test, gates):
-    route = []
-    net_dict = test.nets
-    print("net_dict", net_dict)
-    for i in range(len(netlist)):
-        route2 = []
-        for j in range(len(net_dict[netlist[i]])):
-            route2.append(list(net_dict[netlist[i]][j]))
-        route.append(route2)
-    
-     
-    # plot gates
-    gates2 = []
-    for i in range(len(gates)):
-        gates2.append(gates[i + 1])
-        plt.text(list(gates2[i])[0], list(gates2[i])[1], str(i + 1), color="red", fontsize=14)
-    gates2 = np.array(gates2)
-    plt.xlim(0, board.width)
-    plt.ylim(-1, board.length)
-    plt.scatter(gates2[:, 0], gates2[:, 1], marker = 's')
 
 
-    # plot grid and routes 
-    plt.grid()
-   
+draw(bord1, test, gates, netlist)
 
-    print("route: ", route)
-    for i in range(len(net_dict)):
-        route[i] = np.array(route[i])
-        plt.plot(route[i][0:len(route[i]), 0], route[i][0:len(route[i]), 1], marker = ' ') 
-    
-
-    # save file
-    plt.savefig("output.png")
-
-
-draw(bord1, test, gates)
+score([1,1], [1,2], [3,2])
+score([1,1], [2,1], [3,2])
 
 
 # print("\nVoorgeschreven output")
