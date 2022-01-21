@@ -2,16 +2,13 @@ import matplotlib
 import numpy as np
 from matplotlib import pyplot as plt
 
-
 # function that scores possible moves
 def score(starting_point, possible_move, destination):
 
-    q = 1
     g = abs((possible_move[0] - starting_point[0])) + abs((possible_move[1] - starting_point[1]))
     h = abs(destination[0] - possible_move[0]) + abs(destination[0] - possible_move[0])
 
-
-    successor_g = q * g + 1
+    successor_g = g + 1
     successor_h = h
 
     successor_f = successor_h + successor_g 
