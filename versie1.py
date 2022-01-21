@@ -3,7 +3,7 @@ import numpy as np
 import random
 import csv
 
-from helper_functions import draw, score
+from helper_functions import *
 
 
 chip_number = 0
@@ -253,7 +253,7 @@ def get_origin(path):
         return False
 
 
-print(netlist)
+# print(netlist)
 test = make_net(bord1, gates[netlist[0][0]], gates[netlist[0][1]], netlist)
 print(test.nets)
 
@@ -280,11 +280,17 @@ def output_board(board, netlist, chip_number, netlist_number):
 
 
 
+
 draw(bord1, test, gates, netlist)
 
-score([1,1], [1,2], [3,2])
-score([1,1], [2,1], [3,2])
+print(manhattan_score([1,1], [1,2], [3,3]))
+print(manhattan_score([1,1], [3,1], [3,3]))
+
+print(euclidian_score([1,1], [1,2], [3,3]))
+print(euclidian_score([1,1], [3,1], [3,3]))
+
 
 
 # print("\nVoorgeschreven output")
 # output_board(bord1, netlist, chip_number, netlist_number)
+
