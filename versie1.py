@@ -253,7 +253,7 @@ def get_origin(path):
 
 
 # print(netlist)
-test = make_net(bord1, (1, 5), (6, 5), netlist)
+test = make_net(bord1, gates[netlist[0][0]], gates[netlist[0][1]], netlist)
 # print(test.nets)
 
 
