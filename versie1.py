@@ -1,9 +1,10 @@
 from sys import getallocatedblocks
-import matplotlib
-from matplotlib import pyplot as plt
 import numpy as np
 import random
 import csv
+
+from helper_functions import draw, score
+
 
 chip_number = 0
 netlist_number = 1
@@ -259,7 +260,7 @@ print(test.nets)
 
 # Hardcode voorbeeld om te kijken of de onderstaande functie wel goed nets van
 # een bord kan printen.
-bord1.nets[(1, 2)] = [(1,5),(2,5),(3,5),(4,5),(5,5),(6,5)]
+# bord1.nets[(1, 2)] = [(1,5),(2,5),(3,5),(4,5),(5,5),(6,5)]
 
 # Function that gives a text output of a solution (board) as prescribed in
 # the assignment. 
@@ -305,8 +306,10 @@ def draw(moves, gates):
     # save file
     plt.savefig("moves/" + f"output.png")
 
+draw(bord1, test, gates, netlist)
 
-# draw(make_net(bord1, (gates[0][1], gates[0][2]), (6, 5)), gates)
+score([1,1], [1,2], [3,2])
+score([1,1], [2,1], [3,2])
 
 
 # print("\nVoorgeschreven output")
