@@ -1,3 +1,4 @@
+from queue import Empty
 from sys import getallocatedblocks
 import matplotlib
 from matplotlib import pyplot as plt
@@ -35,6 +36,18 @@ class board:
         self.nets = {}
         self.cost = 0
 
+class path:
+    def __init__(self, coordinates):
+        self.wires = coordinates
+        self.score = 0
+
+class node:
+    def __init__(self, location, parent):
+        self.location = location
+        self.parent = parent
+        self.g = 0
+        self.h = 0
+        self.f = 0
 
 # read chip data of csv file input
 # Function reads the coordinates of the gates on the print, and the netlist
@@ -73,10 +86,6 @@ print("Netlist: ", netlist)
 print("Gates: ", gates)
 print("Gate locations: ", gatelocations)
 
-random.shuffle(netlist)
-print("Netlist na shuffelen: ")
-print(netlist)
-
 bord1 = board(gates)
 
 print("Bord breedte: ", bord1.width)
@@ -84,106 +93,126 @@ print("Bord lengte: ", bord1.length)
 print("")
 
 
-
-# Niet echt meer nodig als we een betere draw hebben
-# # Basic printing function to visualize board configuration
-# def print_board(board):
-#     for y in range(board.length - 1, -1, -1):
-#         row = []
-
-#         for x in range(0, board.width):
-#             al_geprint = False
-
-#             for gate in board.gates:
-                
-#                 if (gate[1], gate[2]) == (x, y):
-#                     print("", gate[0], "", end = '')
-#                     al_geprint = True
-            
-#             if al_geprint == False:            
-#                 print(" + ", end = '')
-
-#         print("\n")
-
-# print_board(bord1)
-
-
 # Create a path on board from loc to dest
 # Branch from starting location and continue to branch to find paths to dest
-def make_net(board, loc, dest, objectives):
-    print("Objective = moving from gate ", objectives[0][0], " to ", objectives[0][1])
-    print("Finding path from ", loc, " to ", dest, "...")
-    hypothetical_paths = [[loc]]
-    result_boards = []
+def make_net(board, start, goal):
+    print("Finding path from ", start, " to ", goal, "...")
+    starting_node = node(start, None)
 
-    moving_possible = True
-    while moving_possible == True:
+    # open list
+    options = [starting_node]
+    # closed list
+    seen = []
 
-        new_paths = []
-        for path in hypothetical_paths:
-            # Check the cardinal direction of last move from path to avoid
-            # backtracking and getting stuck in a loop.
-            origin = get_origin(path)
-            moves = get_moves(board, path, origin)
+    # moving_possible = True
+    # while moving_possible == True:
 
-            # For each spot found that can be moved to, add a new 
-            # path (= old path + spot) to the collection of paths
-            for move in moves:
-                if move != False:
-                    new_path = path + [move]
-                    
-                    # Check if path is a path to destination
-                    # If more than one objective is left, start making net for
-                    # next objective. If not, the final path for current
-                    # configuration is found, so return the board.
-                    if move == dest:
-                        board.nets[objectives[0]] = new_path
-                        print("found path: ")
-                        print(new_path)
-                        print("")
+    # While the collection of paths is not empty, extend the path with the
+    # lowest score (which represents the shortest distance to goal)
+    # 
+    # while options are left:
+    #   pop lowest cost option
+    #   add to closed list (seen)
+    #   get possible moves from option
+    #   for each of these moves:
+    #       If it is not in the open list, add it to the open list.
+    #           current becomes the parent of this option
+    #           Save the f, g, and h of this current option
+    #       If it is in the open list already
+    #           Check to see if the path already existing in the options is
+    #           cheaper (by g cost). 
+    #           If so:
+    #               change the parent of that option already in options to the
+    #               be the current node, and update its g and f score
+    #   
+    #   Stop when you:
+    #       add the target to the closed list (seen). Then a path is found.
+    #       fail to find the target square and the open list is empty.
+    #       In this case no path is found...
+    #   when you find a path, trace back the parents of the found goal node
+    #   to obtain its path.
+    # 
+    # g = dist from start to current node
+    # h = heuristic, distance from current node to goal
+    # f = g + h
+    while options:
+        # extract the most promising path (lowest score)
+        options.sort(key = lambda location: location.f, reverse = True)
 
-                        if len(objectives) > 1:
-                            new_objective = objectives[1]
-                            new_location = board.gates[new_objective[0]]
-                            new_destination = board.gates[new_objective[1]]
+        print("Sorted options")
+        for opt in options:
+            print(opt.location, opt.f)
 
-                            new_board = make_net(board, new_location, new_destination, objectives[1:])
+        current = options.pop()
+        # Check to see if goal is found
+        if current.location == goal:
+            print("found path to ", goal)
+            check = current
+            result = [check.location]
 
-                            if new_board != False:
-                                return new_board
-                        else:
-                            return board
-                    # If path has not yet reached dest, continue moving.
-                    # Except if move is about to pass a gate
-                    elif move not in gatelocations:
-                        new_paths.append(new_path)
+            while check.parent != None:
+                result.append(check.parent.location)
+                check = check.parent
+            result.reverse()
+            
+            return result
 
-        if new_paths == hypothetical_paths:
-            print("Found no new paths")
-            moving_possible = False
+        seen.append(current)
 
-        # update hypothetical paths
-        hypothetical_paths = [] + new_paths
+        print("Walking ", current.location)
 
-    # Moving is no longer possible
+        # Check the cardinal direction of last move from path to avoid
+        # backtracking and getting stuck in a loop.
+        origin = get_origin(current)
+        moves = get_moves(board, current.location, origin)
+
+        # For each spot found that can be moved to, add a new 
+        # path (= old path + spot) to the collection of paths
+        for move in moves:
+            if move != False:
+                new_option = node(move, parent = current)
+                new_option.g = current.g + 1
+                # calculate heuristic
+                new_option.h = abs(move[0] - goal[0]) + abs(move[1] - goal[1])
+                new_option.f = new_option.g + new_option.h
+
+                print("Adding node ", move)
+                print("    parent = ", new_option.parent.location)
+
+                # check if this option is not already in in options
+                already_added = False
+                for option in options:
+                    # if it is already in options, compare it to the new_option
+                    if option.location == move:
+                        already_added = True
+
+                        if option.g < new_option.g:
+                            option = new_option
+
+                if already_added == False:
+                    options.append(new_option)
+
+    print("options ran out....")
     return False
+
+
+
 
 
 # Returns possible moves that can be taken from end of path.
 # For each cardinal direction, refuse to generate move if that direction is
 # the source of the last move taken (to prevent moving back), and refuse to
 # generate move if that move steps outside of the boundarys of the board.
-def get_moves(board, path, origin):
+def get_moves(board, cur_location, origin):
     # print("")
     moves = []
-    cur_location = path[-1]
     # print("Getting moves from location ", cur_location)
 
     if origin != "S" and cur_location[1] < board.length - 1:
         north = (cur_location[0], cur_location[1] + 1)
     else:
         north = False
-    # print("North: ", north)
+    # print("North: ", north)   
 
     if origin != "W" and cur_location[0] < board.width - 1:
         east = (cur_location[0] + 1, cur_location[1])
@@ -202,21 +231,6 @@ def get_moves(board, path, origin):
     else:
         west = False
     # print("West: ", west)
-
-    # prevent path from visiting already visted coordinates
-    for coord in path:
-        if coord == north:
-            # print("coord ", coord, "already visited")
-            north = False
-        if coord == east:
-            # print("coord ", coord, "already visited")
-            east = False
-        if coord == south:
-            # print("coord ", coord, "already visited")
-            south = False
-        if coord == west:
-            # print("coord ", coord, "already visited")
-            west = False
 
     # Prevent moves from entering coordinates already used by other nets in board
     for net in board.nets:
@@ -237,25 +251,26 @@ def get_moves(board, path, origin):
 
 
 # Check what the last direction the path has taken is.
-def get_origin(path):
-    if len(path) == 1:
+def get_origin(node):
+    if node.parent == None:
         return "None"
-    elif path[-1][0] > path[-2][0]:
+    current_location = node.location
+    parent_location = node.parent.location
+    
+    if current_location[0] > parent_location[0]:
         return "E"
-    elif path[-1][0] < path[-2][0]:
+    elif current_location[0] < parent_location[0]:
         return "W"
-    elif path[-1][1] > path[-2][1]:
+    elif current_location[1] > parent_location[1]:
         return "N"
-    elif path[-1][1] < path[-2][1]:
+    elif current_location[1] < parent_location[1]:
         return "S"
     else:
         return False
 
 
-print(netlist)
-test = make_net(bord1, gates[netlist[0][0]], gates[netlist[0][1]], netlist)
-print(test.nets)
-
+test = make_net(bord1, gates[netlist[0][0]], gates[netlist[0][1]])
+print(test)
 
 # Hardcode voorbeeld om te kijken of de onderstaande functie wel goed nets van
 # een bord kan printen.
