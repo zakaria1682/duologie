@@ -2,23 +2,31 @@ import matplotlib
 import numpy as np
 from matplotlib import pyplot as plt
 
-# function that scores possible moves
-def score(starting_point, possible_move, destination):
+# function that scores possible moves manhattan style
+def manhattan_score(starting_point, possible_move, destination):
 
     g = abs((possible_move[0] - starting_point[0])) + abs((possible_move[1] - starting_point[1]))
-    h = abs(destination[0] - possible_move[0]) + abs(destination[0] - possible_move[0])
+    h = abs(destination[0] - possible_move[0]) + abs(destination[1] - possible_move[1])
 
     successor_g = g + 1
     successor_h = h
 
     successor_f = successor_h + successor_g 
 
-    print(successor_f)
-    
+    return successor_f
 
 
-score([1,1], [1,2], [3,2])
-score([1,1], [2,1], [3,2])
+# function that scores possible moves euclidian style
+def euclidian_score(starting_point, possible_move, destination):
+    g = (abs((possible_move[0] - starting_point[0]))**2 + abs((possible_move[1] - starting_point[1]))**2)**0.5
+    h = (abs(destination[0] - possible_move[0])**2 + abs(destination[1] - possible_move[1])**2)**0.5
+
+    successor_g = g + 1
+    successor_h = h
+
+    successor_f = successor_h + successor_g 
+
+    return successor_f
 
 
 # function that graphically displays the steps and saves the graphs to the move directory
