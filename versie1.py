@@ -254,12 +254,12 @@ def get_origin(path):
 
 # print(netlist)
 test = make_net(bord1, gates[netlist[0][0]], gates[netlist[0][1]], netlist)
-# print(test.nets)
+print(test.nets)
 
 
 # Hardcode voorbeeld om te kijken of de onderstaande functie wel goed nets van
 # een bord kan printen.
-bord1.nets[(1, 2)] = [(1,5),(2,5),(3,5),(4,5),(5,5),(6,5)]
+# bord1.nets[(1, 2)] = [(1,5),(2,5),(3,5),(4,5),(5,5),(6,5)]
 
 # Function that gives a text output of a solution (board) as prescribed in
 # the assignment. 
@@ -279,7 +279,7 @@ def output_board(board, netlist, chip_number, netlist_number):
 
 
 # function that graphically displays the steps and saves the graphs to the move directory
-def draw(test, gates):
+def draw(board, test, gates):
     route = []
     net_dict = test.nets
     print("net_dict", net_dict)
@@ -296,16 +296,17 @@ def draw(test, gates):
         gates2.append(gates[i + 1])
         plt.text(list(gates2[i])[0], list(gates2[i])[1], str(i + 1), color="red", fontsize=14)
     gates2 = np.array(gates2)
+    plt.xlim(0, board.width)
+    plt.ylim(-1, board.length)
     plt.scatter(gates2[:, 0], gates2[:, 1], marker = 's')
 
 
     # plot grid and routes 
-    
     plt.grid()
+   
 
     print("route: ", route)
     for i in range(len(net_dict)):
-        # if i%3 == 0:
         route[i] = np.array(route[i])
         plt.plot(route[i][0:len(route[i]), 0], route[i][0:len(route[i]), 1], marker = ' ') 
     
@@ -314,7 +315,7 @@ def draw(test, gates):
     plt.savefig("output.png")
 
 
-draw(test, gates)
+draw(bord1, test, gates)
 
 
 # print("\nVoorgeschreven output")
