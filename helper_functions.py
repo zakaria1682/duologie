@@ -13,7 +13,7 @@ def manhattan_score(starting_point, possible_move, destination):
 
     successor_f = successor_h + successor_g 
 
-    return successor_f
+    return successor_g, succssor_h, successor_f
 
 
 # function that scores possible moves euclidian style
@@ -26,7 +26,7 @@ def euclidian_score(starting_point, possible_move, destination):
 
     successor_f = successor_h + successor_g 
 
-    return successor_f
+    return successor_g, succssor_h, successor_f
 
 
 # function that graphically displays the steps and saves the graphs to the move directory
