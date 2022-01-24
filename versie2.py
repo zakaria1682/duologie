@@ -93,6 +93,7 @@ print("Bord breedte: ", bord1.width)
 print("Bord lengte: ", bord1.length)
 print("")
 
+netlist = sort(netlist, gates)
 
 # Find shortest path from start to goal.
 # a* algorithm. Breadth first search to goal using manhattan/euclidian distance
@@ -303,5 +304,7 @@ for solved_net in bord1.nets:
     print(bord1.nets[solved_net])
 
 draw(bord1, bord1, gates, netlist)
+
+sort(netlist, gates)
 
 
