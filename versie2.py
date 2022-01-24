@@ -37,9 +37,9 @@ class board:
         self.cost = 0
 
 class path:
-    def __init__(self, coordinates):
-        self.wires = coordinates
-        self.score = 0
+    def __init__(self, nodes, score):
+        self.nodes = nodes
+        self.score = score
 
 class node:
     def __init__(self, location, parent):
@@ -93,96 +93,59 @@ print("Bord lengte: ", bord1.length)
 print("")
 
 
-# Create a path on board from loc to dest
-# Branch from starting location and continue to branch to find paths to dest
+# Find shortest path from start to goal.
+# a* algorithm. Breadth first search to goal using manhattan/euclidian distance
+# as a heuristic. Introduce nodes as a way to traverse spaces on the chip print
+# so no entire paths have to be kept in memory.
 def make_net(board, start, goal):
     print("Finding path from ", start, " to ", goal, "...")
+    gatelocations_except_goal = set()
+    gatelocations_except_goal = (gatelocations - set([goal]))
+    print("Gatelocations without ", goal, ": ", gatelocations_except_goal)
     starting_node = node(start, None)
 
-    # open list
+    # List containing all possible locations to be moved from.
     options = [starting_node]
-    # closed list
-    seen = []
-
-    # moving_possible = True
-    # while moving_possible == True:
-
-    # While the collection of paths is not empty, extend the path with the
-    # lowest score (which represents the shortest distance to goal)
-    # 
-    # while options are left:
-    #   pop lowest cost option
-    #   add to closed list (seen)
-    #   get possible moves from option
-    #   for each of these moves:
-    #       If it is not in the open list, add it to the open list.
-    #           current becomes the parent of this option
-    #           Save the f, g, and h of this current option
-    #       If it is in the open list already
-    #           Check to see if the path already existing in the options is
-    #           cheaper (by g cost). 
-    #           If so:
-    #               change the parent of that option already in options to the
-    #               be the current node, and update its g and f score
-    #   
-    #   Stop when you:
-    #       add the target to the closed list (seen). Then a path is found.
-    #       fail to find the target square and the open list is empty.
-    #       In this case no path is found...
-    #   when you find a path, trace back the parents of the found goal node
-    #   to obtain its path.
-    # 
-    # g = dist from start to current node
-    # h = heuristic, distance from current node to goal
-    # f = g + h
+    
     while options:
-        # extract the most promising path (lowest score)
+        # extract the most promising path (lowest f score)
         options.sort(key = lambda location: location.f, reverse = True)
-
         print("Sorted options")
         for opt in options:
             print(opt.location, opt.f)
-
         current = options.pop()
-        # Check to see if goal is found
-        if current.location == goal:
-            print("found path to ", goal)
-            check = current
-            result = [check.location]
 
-            while check.parent != None:
-                result.append(check.parent.location)
-                check = check.parent
-            result.reverse()
+
+        # Check to see if goal is found.
+        if current.location == goal:
+            result = extract_path(current)
             
             return result
 
-        seen.append(current)
-
         print("Walking ", current.location)
+        # Get legal moves from current position.
+        moves = get_moves(board, current, gatelocations_except_goal)
 
-        # Check the cardinal direction of last move from path to avoid
-        # backtracking and getting stuck in a loop.
-        origin = get_origin(current)
-        moves = get_moves(board, current.location, origin)
-
-        # For each spot found that can be moved to, add a new 
-        # path (= old path + spot) to the collection of paths
+        # For each legal move make a new node and set its scores accordingly.
+        # g = distance to node (distance to parent + 1)
+        # h = heuristic, which is distance from node to goal
+        # f = g + h
         for move in moves:
             if move != False:
-                new_option = node(move, parent = current)
-                new_option.g = current.g + 1
-                # calculate heuristic
-                new_option.h = abs(move[0] - goal[0]) + abs(move[1] - goal[1])
+                new_option = node(move[0], parent = current)
+                new_option.g = current.g + move[1]
+                new_option.h = abs(move[0][0] - goal[0]) + abs(move[0][1] - goal[1])
                 new_option.f = new_option.g + new_option.h
 
-                print("Adding node ", move)
+                print("Adding node ", new_option.location)
                 print("    parent = ", new_option.parent.location)
 
-                # check if this option is not already in in options
+                # Check if this option is already in in options.
+                # If it is already in options, a path to the coordinate already
+                # exists. Compare the two and accept shortest path (smallest g).
                 already_added = False
                 for option in options:
-                    # if it is already in options, compare it to the new_option
+                    
                     if option.location == move:
                         already_added = True
 
@@ -200,37 +163,48 @@ def make_net(board, start, goal):
 
 
 # Returns possible moves that can be taken from end of path.
-# For each cardinal direction, refuse to generate move if that direction is
-# the source of the last move taken (to prevent moving back), and refuse to
-# generate move if that move steps outside of the boundarys of the board.
-def get_moves(board, cur_location, origin):
+# Illegal moves are: 
+#   Moves that exceed the boundaries of the board (length and width).
+#   Moves that result in the location of the parent of the node moved from (
+#       moves backward).
+#   Moves that result in the location of a gate that is not the goal gate
+# Also, if a move results in an already visited location by other nets on board,
+# give that move a higher cost to reduce it's priority.
+def get_moves(board, current_node, gatelocations_except_goal):
     # print("")
     moves = []
+    cur_location = current_node.location
     # print("Getting moves from location ", cur_location)
 
-    if origin != "S" and cur_location[1] < board.length - 1:
-        north = (cur_location[0], cur_location[1] + 1)
-    else:
-        north = False
-    # print("North: ", north)   
+    north = ((cur_location[0], cur_location[1] + 1), 1)
+    east = ((cur_location[0] + 1, cur_location[1]), 1)
+    south = ((cur_location[0], cur_location[1] - 1), 1)
+    west = ((cur_location[0] - 1, cur_location[1]), 1)
 
-    if origin != "W" and cur_location[0] < board.width - 1:
-        east = (cur_location[0] + 1, cur_location[1])
-    else:
-        east = False
-    # print("East: ", east)
+    if current_node.parent != None:
+        if (cur_location[1] >= board.length 
+            or north[0] == current_node.parent.location 
+            or north[0] in gatelocations_except_goal):
+            north = False
+        # print("North: ", north)   
 
-    if origin != "N" and cur_location[1] > 0:
-        south = (cur_location[0], cur_location[1] - 1)
-    else:
-        south = False
-    # print("South: ", south)
+        if (cur_location[0] >= board.width 
+            or east[0] == current_node.parent.location 
+            or east[0] in gatelocations_except_goal):
+            east = False
+        # print("East: ", east)
 
-    if origin != "E" and cur_location[0] > 0:
-        west = (cur_location[0] - 1, cur_location[1])
-    else:
-        west = False
-    # print("West: ", west)
+        if (cur_location[1] <= 0 
+            or south[0] == current_node.parent.location 
+            or south[0] in gatelocations_except_goal):
+            south = False
+        # print("South: ", south)
+
+        if (cur_location[0] <= 0 
+            or west[0] == current_node.parent.location 
+            or west[0] in gatelocations_except_goal):
+            west = False
+        # print("West: ", west)
 
     # Prevent moves from entering coordinates already used by other nets in board
     for net in board.nets:
@@ -239,58 +213,40 @@ def get_moves(board, cur_location, origin):
         existing_net = board.nets[net][1:-1]
 
         if north in existing_net:
-            north = False
+            north[1] = 300
         if east in existing_net:
-            east = False
+            east[1] = 300
         if south in existing_net:
-            south = False
+            south[1] = 300
         if west in existing_net:
-            west = False
+            west[1] = 300
 
     return north, east, south, west
 
 
-# Check what the last direction the path has taken is.
-def get_origin(node):
-    if node.parent == None:
-        return "None"
-    current_location = node.location
-    parent_location = node.parent.location
-    
-    if current_location[0] > parent_location[0]:
-        return "E"
-    elif current_location[0] < parent_location[0]:
-        return "W"
-    elif current_location[1] > parent_location[1]:
-        return "N"
-    elif current_location[1] < parent_location[1]:
-        return "S"
-    else:
-        return False
+
+# Extract a path from a node to tree root by traversing parents until a node
+# without parents is found. Wanted path is from root to node, so the path
+# collected is in reverse. Reverse path before returning.
+def extract_path(node):
+    print("found path to ", node.location)
+    result_path = [node.location]
+
+    while node.parent != None:
+        result_path.append(node.parent.location)
+        node = node.parent
+    result_path.reverse()
+
+    return result_path
+
 
 
 test = make_net(bord1, gates[netlist[0][0]], gates[netlist[0][1]])
 print(test)
 
-# Hardcode voorbeeld om te kijken of de onderstaande functie wel goed nets van
-# een bord kan printen.
-bord1.nets[(1, 2)] = [(1,5),(2,5),(3,5),(4,5),(5,5),(6,5)]
 
-# Function that gives a text output of a solution (board) as prescribed in
-# the assignment. 
-def output_board(board, netlist, chip_number, netlist_number):
-    print("net,wires")
-    for net in netlist:
 
-        net_as_string = str(net).replace(" ", "")
-        print("\"" + net_as_string + "\",\"", end = "")
 
-        if net in board.nets:
-            print(str(board.nets[net]).replace(" ", ""), end = '')
-        print("\"")
-
-    print("chip_" + str(chip_number) + "_net_" + str(netlist_number) + ","
-        + str(board.cost))
 
 
 # function that graphically displays the steps and saves the graphs to the move directory
@@ -321,8 +277,3 @@ def draw(moves, gates):
     plt.savefig("moves/" + f"output.png")
 
 
-# draw(make_net(bord1, (gates[0][1], gates[0][2]), (6, 5)), gates)
-
-
-# print("\nVoorgeschreven output")
-# output_board(bord1, netlist, chip_number, netlist_number)

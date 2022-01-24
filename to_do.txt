@@ -46,3 +46,34 @@ Gegeven nets. Moeten deze in volgorde worden gemaakt?
 Zo niet, maak de nets tussen gates die het dichtst bij elkaar staan eerst. 
 Deze hebben de kleinste kans op in de weg te lopen voor andere nets en dus de 
 kleinste kans om geherstructureerd te worden.
+
+
+pseudocode a*:
+# While the collection of paths is not empty, extend the path with the
+# lowest score (which represents the shortest distance to goal)
+# 
+# while options are left:
+#   pop lowest cost option
+#   add to closed list (seen)
+#   get possible moves from option
+#   for each of these moves:
+#       If it is not in the open list, add it to the open list.
+#           current becomes the parent of this option
+#           Save the f, g, and h of this current option
+#       If it is in the open list already
+#           Check to see if the path already existing in the options is
+#           cheaper (by g cost). 
+#           If so:
+#               change the parent of that option already in options to the
+#               be the current node, and update its g and f score
+#   
+#   Stop when you:
+#       add the target to the closed list (seen). Then a path is found.
+#       fail to find the target square and the open list is empty.
+#       In this case no path is found...
+#   when you find a path, trace back the parents of the found goal node
+#   to obtain its path.
+# 
+# g = dist from start to current node
+# h = heuristic, distance from current node to goal
+# f = g + h
