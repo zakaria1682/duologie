@@ -1,10 +1,9 @@
 from queue import Empty
 from sys import getallocatedblocks
-import matplotlib
-from matplotlib import pyplot as plt
-import numpy as np
 import random
 import csv
+
+import helper_functions
 
 chip_number = 0
 netlist_number = 1
@@ -160,8 +159,6 @@ def make_net(board, start, goal):
 
 
 
-
-
 # Returns possible moves that can be taken from end of path.
 # Illegal moves are: 
 #   Moves that exceed the boundaries of the board (length and width).
@@ -249,31 +246,6 @@ print(test)
 
 
 
-# function that graphically displays the steps and saves the graphs to the move directory
-def draw(moves, gates):
-    route = []
-    print(moves)
-    # make array of arrays
-    for i in range(len(moves)):
-        for j in range(len(moves[0])):
-            route.append([moves[i][j][0], moves[i][j][1]])
-    
-    # plot gates
-    gates = np.array(gates)
-    plt.scatter(gates[:, 1], gates[:, 2], marker = 's')
-    for i in range(0,5):
-        plt.text(gates[i, 1], gates[i, 2], str(i + 1), color="red", fontsize=14)
 
-    # plot grid and routes 
-    route = np.array(route)
-    plt.grid()
-    for i in range(len(route)):
-        if i%3 == 0:
-            plt.plot(route[i:3 + i, 0], route[i:3 + i, 1], marker = ' ') 
-            # plt.savefig("moves/" + f"output{i}.png")
-    
-
-    # save file
-    plt.savefig("moves/" + f"output.png")
 
 
