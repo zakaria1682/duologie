@@ -3,17 +3,18 @@ from sys import getallocatedblocks
 import random
 import csv
 
-import helper_functions
+# import helper_functions
+from helper_functions import *
 
 chip_number = 0
 netlist_number = 1
 
-class net:
-    def __init__(self, start, destination):
-        self.wires = []
-        self.start = start
-        self.destination = destination
-        cost = 0
+# class net:
+#     def __init__(self, start, destination):
+#         self.wires = []
+#         self.start = start
+#         self.destination = destination
+#         cost = 0
 
 class board:
     def __init__(self, gates):
@@ -47,6 +48,7 @@ class node:
         self.g = 0
         self.h = 0
         self.f = 0
+        self.intersection = False
 
 # read chip data of csv file input
 # Function reads the coordinates of the gates on the print, and the netlist
@@ -97,10 +99,10 @@ print("")
 # as a heuristic. Introduce nodes as a way to traverse spaces on the chip print
 # so no entire paths have to be kept in memory.
 def make_net(board, start, goal):
-    print("Finding path from ", start, " to ", goal, "...")
+    print("\nFinding path from ", start, " to ", goal, "...\n#########################################################")
     gatelocations_except_goal = set()
     gatelocations_except_goal = (gatelocations - set([goal]))
-    print("Gatelocations without ", goal, ": ", gatelocations_except_goal)
+    # print("Gatelocations without ", goal, ": ", gatelocations_except_goal)
     starting_node = node(start, None)
 
     # List containing all possible locations to be moved from.
@@ -121,7 +123,7 @@ def make_net(board, start, goal):
             
             return result
 
-        print("Walking ", current.location)
+        # print("Walking ", current.location)
         # Get legal moves from current position.
         moves = get_moves(board, current, gatelocations_except_goal)
 
@@ -135,9 +137,11 @@ def make_net(board, start, goal):
                 new_option.g = current.g + move[1]
                 new_option.h = abs(move[0][0] - goal[0]) + abs(move[0][1] - goal[1])
                 new_option.f = new_option.g + new_option.h
+                if move[1] == 300:
+                    new_option.intersection = True
 
-                print("Adding node ", new_option.location)
-                print("    parent = ", new_option.parent.location)
+                # print("Adding node ", new_option.location)
+                # print("    parent = ", new_option.parent.location)
 
                 # Check if this option is already in in options.
                 # If it is already in options, a path to the coordinate already
@@ -173,6 +177,7 @@ def get_moves(board, current_node, gatelocations_except_goal):
     cur_location = current_node.location
     # print("Getting moves from location ", cur_location)
 
+
     north = ((cur_location[0], cur_location[1] + 1), 1)
     east = ((cur_location[0] + 1, cur_location[1]), 1)
     south = ((cur_location[0], cur_location[1] - 1), 1)
@@ -203,20 +208,50 @@ def get_moves(board, current_node, gatelocations_except_goal):
             west = False
         # print("West: ", west)
 
-    # Prevent moves from entering coordinates already used by other nets in board
+    # Prevent moves from entering coordinates already used by other nets in 
+    # board. Collect all present wires on board. If wire is already in use,
+    # current move is making an intersection. Set cost to 300.
+    # If parent is also already an intersection, move has overlap. Overlap is
+    # not allowed so set move to false.
+    existing_wires = set()
     for net in board.nets:
         # [1:-1] so it can still visit its destination gate even if that gate
         # has been visited once before by another net.
-        existing_net = board.nets[net][1:-1]
+        existing_net = set(board.nets[net][1:-1])
+        existing_wires = existing_wires.union(existing_net)
 
-        if north in existing_net:
-            north[1] = 300
-        if east in existing_net:
-            east[1] = 300
-        if south in existing_net:
-            south[1] = 300
-        if west in existing_net:
-            west[1] = 300
+    if north != False and north[0] in existing_wires:
+        # print("Intersection ")
+        if (current_node.parent != None
+            and current_node.parent.intersection == True):
+            print("overlap!")
+            north = False
+        else:
+            north = (north[0], 300)
+    if east != False and east[0] in existing_wires:
+        # print("Intersection ")
+        if (current_node.parent != None
+            and current_node.parent.intersection == True):
+            print("overlap!")
+            east = False
+        else:
+            east = (east[0], 300)
+    if south != False and south[0] in existing_wires:
+        # print("Intersection ")
+        if (current_node.parent != None
+            and current_node.parent.intersection == True):
+            print("overlap!")
+            south = False
+        else:
+            south = (south[0], 300)
+    if west != False and west[0] in existing_wires:
+        # print("Intersection ")
+        if (current_node.parent != None 
+            and current_node.parent.intersection == True):
+            print("overlap!")
+            west = False
+        else:
+            west = (west[0], 300)
 
     return north, east, south, west
 
@@ -238,14 +273,35 @@ def extract_path(node):
 
 
 
-test = make_net(bord1, gates[netlist[0][0]], gates[netlist[0][1]])
-print(test)
+# test = make_net(bord1, gates[netlist[0][0]], gates[netlist[0][1]])
+# print(test)
 
 
 
+def solve_board(board, netlist):
+
+    i = 0
+    for objective in netlist:
+        # print("Start: ", gates[objective[0]])
+        # print("Goal: ", gates[objective[1]])
+        # print("")
+
+        net = make_net(board, gates[objective[0]], gates[objective[1]])
+        # print(net)
+        # print("")
+        board.nets[objective] = net
+
+        i += 1
+        # if i > 2:
+        #     break
 
 
+solve_board(bord1, netlist)
 
+for solved_net in bord1.nets:
 
+    print(bord1.nets[solved_net])
+
+draw(bord1, bord1, gates, netlist)
 
 

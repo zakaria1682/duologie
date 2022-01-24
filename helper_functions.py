@@ -38,7 +38,7 @@ def euclidian_distance(starting_point, possible_move, destination):
 def draw(board, test, gates, netlist):
     route = []
     net_dict = test.nets
-    print("net_dict", net_dict)
+    # print("net_dict", net_dict)
     for i in range(len(netlist)):
         route2 = []
         for j in range(len(net_dict[netlist[i]])):
@@ -57,18 +57,15 @@ def draw(board, test, gates, netlist):
     plt.ylim(-1, board.length)
     plt.scatter(gates2[:, 0], gates2[:, 1], marker = 's')
 
-
     # plot grid and routes 
     plt.grid()
    
-
-    print("route: ", route)
+    # print("route: ", route)
     for i in range(len(net_dict)):
         route[i] = np.array(route[i])
         plt.plot(route[i][0:len(route[i]), 0], route[i][0:len(route[i]), 1], 
             marker = ' ') 
     
-
     # save file
     plt.savefig("output.png")
 
