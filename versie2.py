@@ -149,7 +149,7 @@ def make_net(board, start, goal):
                 already_added = False
                 for option in options:
                     
-                    if option.location == move:
+                    if option.location == move[0]:
                         already_added = True
 
                         if option.g < new_option.g:
@@ -184,13 +184,13 @@ def get_moves(board, current_node, gatelocations_except_goal):
     west = ((cur_location[0] - 1, cur_location[1]), 1)
 
     if current_node.parent != None:
-        if (cur_location[1] >= board.length 
+        if (cur_location[1] >= (board.length - 1)
             or north[0] == current_node.parent.location 
             or north[0] in gatelocations_except_goal):
             north = False
         # print("North: ", north)   
 
-        if (cur_location[0] >= board.width 
+        if (cur_location[0] >= (board.width - 1)
             or east[0] == current_node.parent.location 
             or east[0] in gatelocations_except_goal):
             east = False
@@ -261,7 +261,7 @@ def get_moves(board, current_node, gatelocations_except_goal):
 # without parents is found. Wanted path is from root to node, so the path
 # collected is in reverse. Reverse path before returning.
 def extract_path(node):
-    print("found path to ", node.location)
+    # print("found path to ", node.location)
     result_path = [node.location]
 
     while node.parent != None:
