@@ -1,29 +1,6 @@
 import matplotlib
 import numpy as np
 from matplotlib import pyplot as plt
- 
-
-def sort(netlist, gates):
-    distance = []
-    netlist_sorted = []
-    for net in netlist:
-        distance.append(abs(gates[net[0]][0] - gates[net[1]][0]) + abs(gates[net[0]][1] - gates[net[1]][1]))
-        netlist_sorted.append(net)
-        
-    # go through the list as many times as there are elements
-    for i in range(len(distance)):
-        # get the last pair of adjacent elements to be (n-2, n-1)
-        for j in range(len(distance) - 1):
-            if distance[j] > distance[j+1]:
-                # swap
-                distance[j], distance[j+1] = distance[j+1], distance[j]
-                netlist_sorted[j], netlist_sorted[j+1] = netlist_sorted[j+1], netlist_sorted[j]
-    
-    print("distance: ", distance)
-    print("netlist_sorted: ", netlist_sorted)
-
-    return netlist_sorted
-
 
 # function that scores possible moves manhattan style
 def manhattan_distance(starting_point, possible_move, destination):
@@ -54,6 +31,22 @@ def euclidian_distance(starting_point, possible_move, destination):
     successor_f = successor_h + successor_g 
 
     return successor_g, successor_h, successor_f
+
+
+def euclidian_distance(point_a, point_b):
+    result = (abs((point_a[0] - point_b[0]))**2 
+        + abs((point_a[1] - point_b[1]))**2)**0.5
+
+    return result
+
+test = euclidian_distance((0, 0), (2, 2))
+print(test)
+
+def sort_netlist(netlist):
+    netlist.sort(key = lambda net: euclidian_distance(net), reverse = True)
+    return netlist
+
+
 
 
 # function that graphically displays the steps and saves the graphs to the move 
