@@ -18,19 +18,19 @@ def manhattan_distance(starting_point, possible_move, destination):
     return successor_g, successor_h, successor_f
 
 
-# function that scores possible moves euclidian style
-def euclidian_distance(starting_point, possible_move, destination):
-    g = (abs((possible_move[0] - starting_point[0]))**2 
-        + abs((possible_move[1] - starting_point[1]))**2)**0.5
-    h = (abs(destination[0] - possible_move[0])**2 
-        + abs(destination[1] - possible_move[1])**2)**0.5
+# # function that scores possible moves euclidian style
+# def euclidian_distance(starting_point, possible_move, destination):
+#     g = (abs((possible_move[0] - starting_point[0]))**2 
+#         + abs((possible_move[1] - starting_point[1]))**2)**0.5
+#     h = (abs(destination[0] - possible_move[0])**2 
+#         + abs(destination[1] - possible_move[1])**2)**0.5
 
-    successor_g = g + 1
-    successor_h = h
+#     successor_g = g + 1
+#     successor_h = h
 
-    successor_f = successor_h + successor_g 
+#     successor_f = successor_h + successor_g 
 
-    return successor_g, successor_h, successor_f
+#     return successor_g, successor_h, successor_f
 
 
 def euclidian_distance(point_a, point_b):
@@ -42,8 +42,8 @@ def euclidian_distance(point_a, point_b):
 test = euclidian_distance((0, 0), (2, 2))
 print(test)
 
-def sort_netlist(netlist):
-    netlist.sort(key = lambda net: euclidian_distance(net), reverse = True)
+def sort_netlist(netlist, gates):
+    netlist.sort(key = lambda net: euclidian_distance(gates[net[0]], gates[net[1]]))
     return netlist
 
 
@@ -55,11 +55,13 @@ def draw(board, test, gates, netlist):
     route = []
     net_dict = test.nets
     # print("net_dict", net_dict)
-    for i in range(len(netlist)):
+    for i in range(len(net_dict)):
         route2 = []
-        for j in range(len(net_dict[netlist[i]])):
-            route2.append(list(net_dict[netlist[i]][j]))
-        route.append(route2)
+        # print(net_dict[netlist[i]])
+        if net_dict[netlist[i]] != False:
+            for j in range(len(net_dict[netlist[i]])):
+                route2.append(list(net_dict[netlist[i]][j]))
+            route.append(route2)
     
      
     # plot gates
@@ -69,7 +71,7 @@ def draw(board, test, gates, netlist):
         plt.text(list(gates2[i])[0], list(gates2[i])[1], str(i + 1), 
         color="red", fontsize=14)
     gates2 = np.array(gates2)
-    plt.xlim(0, board.width)
+    plt.xlim(-1, board.width)
     plt.ylim(-1, board.length)
     plt.scatter(gates2[:, 0], gates2[:, 1], marker = 's')
 
@@ -77,7 +79,7 @@ def draw(board, test, gates, netlist):
     plt.grid()
    
     # print("route: ", route)
-    for i in range(len(net_dict)):
+    for i in range(len(route)):
         route[i] = np.array(route[i])
         plt.plot(route[i][0:len(route[i]), 0], route[i][0:len(route[i]), 1], 
             marker = ' ') 
@@ -101,3 +103,6 @@ def output_board(board, netlist, chip_number, netlist_number):
 
     print("chip_" + str(chip_number) + "_net_" + str(netlist_number) + ","
         + str(board.cost))
+
+def gate(coord, gatelocations):
+    return (coord in gatelocations)

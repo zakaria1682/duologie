@@ -77,3 +77,13 @@ pseudocode a*:
 # g = dist from start to current node
 # h = heuristic, distance from current node to goal
 # f = g + h
+
+
+
+Bij checken voor overlap bij laatste stap naar node:
+    Algoritme vergelijkt (huidige loc, move loc) met de laatste twee en eerste
+    twee locaties in elke net
+    maar laatste twee alleen in de volgorde van [eennaarlaatste, laatste], en
+    niet andersom.
+    bestaat de stap [(3, 4), (4, 4)] al in een net? Dan kan de stap
+    [(4, 4), (3, 4)] nogsteeds, wat niet zou mogen.
