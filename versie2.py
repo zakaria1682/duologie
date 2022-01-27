@@ -9,7 +9,7 @@ import time
 from helper_functions import *
 
 chip_number = 0
-netlist_number = 3
+netlist_number = 1
 
 # class net:
 #     def __init__(self, start, destination):
@@ -343,7 +343,7 @@ def solve_board(board, netlist):
         print(net)
         print("")
         board.nets[objective] = net
-        draw(board, board, gates, netlist)
+        draw3d(board, gates, netlist)
         # time.sleep(1)   
 
 
@@ -354,7 +354,8 @@ def solve_board(board, netlist):
         #     break
 
 
-# draw(bord1, bord1, gates, netlist)
+# LET OP! dict is nu hardcoded
+draw3d(bord1, gates, netlist)
 
 solve_board(bord1, netlist)
 
