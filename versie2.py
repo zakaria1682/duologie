@@ -8,8 +8,8 @@ import time
 # import helper_functions
 from helper_functions import *
 
-chip_number = 0
-netlist_number = 1
+chip_number = 1
+netlist_number = 6
 
 # class net:
 #     def __init__(self, start, destination):
@@ -99,7 +99,7 @@ print("")
 # Netlist sorteren....
 netlist = sort_netlist(netlist, gates)
 # Netlist hardcode voorbeeld
-netlist = [(3, 5), (3, 4), (1, 3), (2, 3), (4, 5), (1, 5), (2, 4), (1, 4), (2, 5), (1, 2)]
+# netlist = [(3, 5), (3, 4), (1, 3), (2, 3), (4, 5), (1, 5), (2, 4), (1, 4), (2, 5), (1, 2)]
 print("\nNetlist na sorteren: ")
 print(netlist)
 
@@ -293,9 +293,7 @@ def extract_path(node):
 
 
 def solve_board(board, netlist):
-
     i = 0
-    print("netlist: ", netlist)
     for objective in netlist:
         print("\nObjective: ", objective)
         print("#################################")
@@ -308,11 +306,9 @@ def solve_board(board, netlist):
         print(net)
         print("")
         board.nets[objective] = net
+
         draw3d(board, gates, netlist)
-        # time.sleep(1)   
-
-
-
+        # time.sleep(0.3)  
 
         i += 1
         # if i > 2:
@@ -320,7 +316,7 @@ def solve_board(board, netlist):
 
 
 # LET OP! dict is nu hardcoded
-draw3d(bord1, gates, netlist)
+draw3d(bord1, gates, [])
 
 solve_board(bord1, netlist)
 
@@ -329,5 +325,7 @@ for solved_net in bord1.nets:
     print(bord1.nets[solved_net])
 
 print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n")
+
+draw3d(bord1, gates, netlist)
 
 

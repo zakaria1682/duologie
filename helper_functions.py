@@ -105,13 +105,19 @@ def draw3d(board, gates, netlist):
     route = []
     net_dict = board.nets
 
-    for i in range(len(netlist)):
-        route2 = []
-        for j in range(len(net_dict[netlist[i]])):
-            route2.append(list(net_dict[netlist[i]][j]))
-        route.append(route2)
+    # print(netlist)
+    # print(net_dict)
+
+    tupleroute = [net_dict[obj] for obj in net_dict if net_dict[obj] != False]
+
+    route = []
+    for net in tupleroute:
+        route.append([list(point) for point in net])
+
+    # print("ROUTES BUT IN LIST")
+    # print(route)
     
-    fig = plt.figure()
+    fig = plt.figure(figsize = (15, 15))
     ax = plt.axes()
     plt.axis('off')
     ax = fig.add_subplot(111, projection='3d')
@@ -128,7 +134,7 @@ def draw3d(board, gates, netlist):
 
     # plot grid and routes 
     cmap = plt.get_cmap('gnuplot')
-    colors = [cmap(i) for i in np.linspace(0, 1, len(net_dict))]
+    colors = [cmap(i) for i in np.linspace(0, 1, len(route))]
     for i, color in enumerate(colors, start=0):
         route[i] = np.array(route[i])
         
@@ -137,10 +143,13 @@ def draw3d(board, gates, netlist):
         ax.add_line(line)
     
     
-    lis = [i for i in range(0, board.length + 1)]
-    ax.set_xticks(lis, minor=False)
-    ax.set_yticks(lis, minor=False)
-    ax.set_zticks(lis, minor=False)
+    y_axis = [i for i in range(0, board.length + 1)]
+    x_axis = [i for i in range(0, board.width + 1)]
+    z_axis = [i for i in range(0, board.height + 1)]
+    ax.set_xticks(x_axis, minor = False)
+    ax.set_yticks(y_axis, minor = False)
+    ax.set_zticks(z_axis, minor = False)
+    # ax.tight_layout()
 
     # save file
     plt.savefig("output_3d.png")
