@@ -281,13 +281,7 @@ def output_board(board, netlist, chip_number, netlist_number):
 
 
 
-draw(bord1, test, gates, netlist)
-
-print(manhattan_distance([1,1], [1,2], [3,3]))
-print(manhattan_distance([1,1], [3,1], [3,3]))
-
-print(euclidian_distance([1,1], [1,2], [3,3]))
-print(euclidian_distance([1,1], [3,1], [3,3]))
+draw3d(bord1, gates, netlist)
 
 
 
