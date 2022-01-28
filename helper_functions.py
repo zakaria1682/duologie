@@ -3,6 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 import mpl_toolkits.mplot3d.art3d as art3d
 
+
 # function that scores possible moves manhattan style
 def manhattan_distance(starting_point, possible_move, destination):
 
@@ -19,16 +20,12 @@ def manhattan_distance(starting_point, possible_move, destination):
     return successor_g, successor_h, successor_f
 
 
-
-
 def euclidian_distance(point_a, point_b):
     result = (abs((point_a[0] - point_b[0]))**2 
         + abs((point_a[1] - point_b[1]))**2)**0.5
 
     return result
 
-test = euclidian_distance((0, 0), (2, 2))
-print(test)
 
 def euc_3d(point_a, point_b):
     result = (abs((point_a[0] - point_b[0]))**2 
@@ -41,8 +38,6 @@ def euc_3d(point_a, point_b):
 def sort_netlist(netlist, gates):
     netlist.sort(key = lambda net: euclidian_distance(gates[net[0]], gates[net[1]]))
     return netlist
-
-
 
 
 # function that graphically displays the steps and saves the graphs to the move 
@@ -108,9 +103,6 @@ def gate(coord, gatelocations):
 # directory in 3d.
 def draw3d(board, gates, netlist):
     route = []
-
-    # LET OP! dict is nu hardcoded
-    # net_dict = {(1, 3): [(1, 5, 0), (1, 5, 1), (3, 5, 1), (3, 5, 0), (4, 5, 0), (4, 4, 0)], (1, 2): [(1, 5, 0), (1, 6, 0), (2, 6, 0), (2, 6, 1), (3, 6, 1), (3, 6, 5), (4, 6, 5), (5, 6, 5), (5, 6, 0), (6, 6, 0), (6, 5, 0)], (3, 5): [(4, 4, 0), (4, 3, 0), (4, 2, 0), (4, 1, 0), (3, 1, 0)], (4, 2): [(6, 2, 0), (6, 3, 0), (6, 4, 0), (6, 5, 0)], (4, 5): [(6, 2, 0), (6, 2, 1), (6, 1, 1), (6, 0, 1), (6, 0, 0), (5, 0, 0), (4, 0, 0), (3, 0, 0), (3, 1, 0)]}
     net_dict = board.nets
 
     for i in range(len(netlist)):
@@ -119,7 +111,6 @@ def draw3d(board, gates, netlist):
             route2.append(list(net_dict[netlist[i]][j]))
         route.append(route2)
     
-
     fig = plt.figure()
     ax = plt.axes()
     plt.axis('off')
@@ -133,21 +124,9 @@ def draw3d(board, gates, netlist):
         ax.text(list(gates2[i])[0], list(gates2[i])[1], 0,  str(i + 1), 
         color="red", fontsize=14)
     gates2 = np.array(gates2)
-
-    # lis = [i for i in range(-1, board.length + 1)]
-    # ax.set_xlim(-1, board.width)
-    # ax.set_xticks(lis, minor=False)
-    # ax.set_ylim(-1, board.length)
-    # ax.set_yticks(lis, minor=False)
-    # ax.set_zlim(0, board.length)
     ax.scatter(gates2[:, 0], gates2[:, 1], 0, marker = 's')
 
     # plot grid and routes 
-    # plt.grid()
-   
-    
-    
-    # print("route: ", route)
     cmap = plt.get_cmap('gnuplot')
     colors = [cmap(i) for i in np.linspace(0, 1, len(net_dict))]
     for i, color in enumerate(colors, start=0):
@@ -159,11 +138,8 @@ def draw3d(board, gates, netlist):
     
     
     lis = [i for i in range(0, board.length + 1)]
-    # ax.set_xlim(0, board.width)
     ax.set_xticks(lis, minor=False)
-    # ax.set_ylim(0, board.length)
     ax.set_yticks(lis, minor=False)
-    # ax.set_zlim(0, board.length)
     ax.set_zticks(lis, minor=False)
 
     # save file
