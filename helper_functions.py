@@ -18,19 +18,6 @@ def manhattan_distance(starting_point, possible_move, destination):
     return successor_g, successor_h, successor_f
 
 
-# # function that scores possible moves euclidian style
-# def euclidian_distance(starting_point, possible_move, destination):
-#     g = (abs((possible_move[0] - starting_point[0]))**2 
-#         + abs((possible_move[1] - starting_point[1]))**2)**0.5
-#     h = (abs(destination[0] - possible_move[0])**2 
-#         + abs(destination[1] - possible_move[1])**2)**0.5
-
-#     successor_g = g + 1
-#     successor_h = h
-
-#     successor_f = successor_h + successor_g 
-
-#     return successor_g, successor_h, successor_f
 
 
 def euclidian_distance(point_a, point_b):
@@ -41,6 +28,14 @@ def euclidian_distance(point_a, point_b):
 
 test = euclidian_distance((0, 0), (2, 2))
 print(test)
+
+def euc_3d(point_a, point_b):
+    result = (abs((point_a[0] - point_b[0]))**2 
+        + abs((point_a[1] - point_b[1])) 
+        + abs((point_a[2] - point_b[2]))**2)**0.5
+
+    return result
+
 
 def sort_netlist(netlist, gates):
     netlist.sort(key = lambda net: euclidian_distance(gates[net[0]], gates[net[1]]))

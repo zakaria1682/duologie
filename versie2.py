@@ -34,6 +34,7 @@ class board:
         # x & y + 2 to create extra ring of space around chip print
         self.width = max_x + 2
         self.length = max_y + 2
+        self.height = 7
         self.gates = gates
         self.nets = {}
         self.cost = 0
@@ -63,7 +64,7 @@ def read_data(chip_number, netlist_number):
     with open(print_filepath) as input:
         gate_data = [line for line in csv.reader(input)]
 
-    gates = dict([(int(gatenum), (int(gate_x), int(gate_y))) 
+    gates = dict([(int(gatenum), (int(gate_x), int(gate_y), 0)) 
             for gatenum, gate_x, gate_y in gate_data[1:]])
 
     gatelocations = set()
@@ -97,6 +98,8 @@ print("")
 
 # Netlist sorteren....
 netlist = sort_netlist(netlist, gates)
+# Netlist hardcode voorbeeld
+netlist = [(3, 5), (3, 4), (1, 3), (2, 3), (4, 5), (1, 5), (2, 4), (1, 4), (2, 5), (1, 2)]
 print("\nNetlist na sorteren: ")
 print(netlist)
 
@@ -146,7 +149,7 @@ def make_net(board, start, goal):
                 if move[0] not in seen:
                     new_option = node(move[0], parent = current)
                     new_option.g = current.g + move[1]
-                    new_option.h = euclidian_distance(move[0], goal)
+                    new_option.h = euc_3d(move[0], goal)
                     new_option.f = new_option.g + new_option.h
                     if move[1] == 300:
                         new_option.intersection = True
@@ -184,40 +187,48 @@ def make_net(board, start, goal):
 # give that move a higher cost to reduce it's priority.
 def get_moves(board, current_node, gatelocations_except_goal, goal):
     # print("")
-    moves = []
     cur_location = current_node.location
     # print("Getting moves from location ", cur_location)
 
+    north = ((cur_location[0], cur_location[1] + 1, cur_location[2]), 1)
+    east = ((cur_location[0] + 1, cur_location[1], cur_location[2]), 1)
+    south = ((cur_location[0], cur_location[1] - 1, cur_location[2]), 1)
+    west = ((cur_location[0] - 1, cur_location[1], cur_location[2]), 1)
+    up = ((cur_location[0], cur_location[1], cur_location[2] + 1), 1)
+    down = ((cur_location[0], cur_location[1], cur_location[2] - 1), 1)
 
-    north = ((cur_location[0], cur_location[1] + 1), 1)
-    east = ((cur_location[0] + 1, cur_location[1]), 1)
-    south = ((cur_location[0], cur_location[1] - 1), 1)
-    west = ((cur_location[0] - 1, cur_location[1]), 1)
+    if cur_location[1] >= board.length - 1:
+        north = False
 
+    if cur_location[0] >= (board.width - 1):
+        east = False 
+    
+    if cur_location[1] <= 0:
+        south = False
+
+    if cur_location[0] <= 0:
+        west = False
+
+    if cur_location[2] >= (board.height - 1):
+        up = False
+
+    if cur_location[2] <= 0:
+        down = False
+
+    moves = [north, east, south, west, up, down]
+
+    # Prevent move from going towards a gate that is not its objective
+    for i in range(0, len(moves)):
+        if moves[i] != False:
+            if moves[i][0] in gatelocations_except_goal:
+                moves[i] == False
+    
+    # Prevent moves from going backwards (towards their parent)
     if current_node.parent != None:
-        if (cur_location[1] >= (board.length - 1)
-            or north[0] == current_node.parent.location 
-            or north[0] in gatelocations_except_goal):
-            north = False 
-        # print("North: ", north)   
-
-        if (cur_location[0] >= (board.width - 1)
-            or east[0] == current_node.parent.location 
-            or east[0] in gatelocations_except_goal):
-            east = False
-        # print("East: ", east)
-
-        if (cur_location[1] <= 0 
-            or south[0] == current_node.parent.location 
-            or south[0] in gatelocations_except_goal):
-            south = False
-        # print("South: ", south)
-
-        if (cur_location[0] <= 0 
-            or west[0] == current_node.parent.location 
-            or west[0] in gatelocations_except_goal):
-            west = False
-        # print("West: ", west)
+        for i in range(0, len(moves)):
+            if moves[i] != False:
+                if moves[i][0] == current_node.parent.location:
+                    moves[i] = False
 
     # Prevent moves from entering coordinates already used by other nets in 
     # board. Collect all present wires on board. If wire is already in use,
@@ -239,70 +250,24 @@ def get_moves(board, current_node, gatelocations_except_goal, goal):
             
             a_is_gate = gate(current_node.location, gatelocations)
 
-            if north != False and north[0] in wire_set:
-                b_is_gate = gate(north[0], gatelocations)
-                if a_is_gate or b_is_gate:
-                    # Check for overlap with start or end of existing net                    
-                    if (current_node.location in ends_of_net 
-                        and north[0] in ends_of_net):
-                        north = False
-                    elif not b_is_gate:
-                        north = (north[0], 300)
-                elif current_node.intersection == True:
-                    # overlap
-                    north = False
-                else:
-                    north = (north[0], 300)
+            for i in range(0, len(moves)):
+                if moves[i] != False and moves[i][0] in wire_set:
+                    b_is_gate = gate(moves[i][0], gatelocations)
+                    
+                    if a_is_gate or b_is_gate:
+                        # Check for overlap with start or end of existing net                    
+                        if (current_node.location in ends_of_net 
+                            and moves[i][0] in ends_of_net):
+                            moves[i] = False
+                        elif not b_is_gate:
+                            moves[i] = (moves[i][0], 300)
+                    elif current_node.intersection == True:
+                        # overlap
+                        moves[i] = False
+                    else:
+                        moves[i] = (moves[i][0], 300)
 
-            if east != False and east[0] in wire_set:
-                b_is_gate = gate(east[0], gatelocations)
-                if a_is_gate or b_is_gate:
-                    # Check for overlap with start or end of existing net
-                    if (current_node.location in ends_of_net 
-                        and east[0] in ends_of_net):
-                        east = False
-                    elif not b_is_gate:
-                        east = (east[0], 300)
-                elif current_node.intersection == True:
-                    # overlap
-                    east = False
-                else:
-                    east = (east[0], 300)
-
-            if south != False and south[0] in wire_set:
-                b_is_gate = gate(south[0], gatelocations)
-                if a_is_gate or b_is_gate:
-                    # Check for overlap with start or end of existing net
-                    if (current_node.location in ends_of_net 
-                        and south[0] in ends_of_net):
-                        south = False
-                    elif not b_is_gate:
-                        south = (south[0], 300)
-                elif current_node.intersection == True:
-                    # overlap
-                    south = False
-                else:
-                    south = (south[0], 300)
-
-            if west != False and west[0] in wire_set:
-                b_is_gate = gate(west[0], gatelocations)
-                if a_is_gate or b_is_gate:
-                    # Check for overlap with start or end of existing net
-                    if (current_node.location in ends_of_net 
-                        and west[0] in ends_of_net):
-                        west = False
-                    elif not b_is_gate:
-                        west = (west[0], 300)
-                elif current_node.intersection == True:
-                    # overlap
-                    west = False
-                else:
-                    west = (west[0], 300)
-
-
-        
-
-    return north, east, south, west
+    return moves
 
 
 
