@@ -110,8 +110,8 @@ def draw3d(board, gates, netlist):
     route = []
 
     # LET OP! dict is nu hardcoded
-    net_dict = {(1, 3): [(1, 5, 0), (1, 5, 1), (3, 5, 1), (3, 5, 0), (4, 5, 0), (4, 4, 0)], (1, 2): [(1, 5, 0), (1, 6, 0), (2, 6, 0), (2, 6, 1), (3, 6, 1), (3, 6, 5), (4, 6, 5), (5, 6, 5), (5, 6, 0), (6, 6, 0), (6, 5, 0)], (3, 5): [(4, 4, 0), (4, 3, 0), (4, 2, 0), (4, 1, 0), (3, 1, 0)], (4, 2): [(6, 2, 0), (6, 3, 0), (6, 4, 0), (6, 5, 0)], (4, 5): [(6, 2, 0), (6, 2, 1), (6, 1, 1), (6, 0, 1), (6, 0, 0), (5, 0, 0), (4, 0, 0), (3, 0, 0), (3, 1, 0)]}
-    # net_dict = board.nets
+    # net_dict = {(1, 3): [(1, 5, 0), (1, 5, 1), (3, 5, 1), (3, 5, 0), (4, 5, 0), (4, 4, 0)], (1, 2): [(1, 5, 0), (1, 6, 0), (2, 6, 0), (2, 6, 1), (3, 6, 1), (3, 6, 5), (4, 6, 5), (5, 6, 5), (5, 6, 0), (6, 6, 0), (6, 5, 0)], (3, 5): [(4, 4, 0), (4, 3, 0), (4, 2, 0), (4, 1, 0), (3, 1, 0)], (4, 2): [(6, 2, 0), (6, 3, 0), (6, 4, 0), (6, 5, 0)], (4, 5): [(6, 2, 0), (6, 2, 1), (6, 1, 1), (6, 0, 1), (6, 0, 0), (5, 0, 0), (4, 0, 0), (3, 0, 0), (3, 1, 0)]}
+    net_dict = board.nets
 
     for i in range(len(netlist)):
         route2 = []
@@ -121,7 +121,8 @@ def draw3d(board, gates, netlist):
     
 
     fig = plt.figure()
-    ax = plt.axes(projection='3d')
+    ax = plt.axes()
+    plt.axis('off')
     ax = fig.add_subplot(111, projection='3d')
     ax.set_box_aspect((1,1,1))
 
@@ -145,15 +146,18 @@ def draw3d(board, gates, netlist):
     # plt.grid()
    
     
+    
     # print("route: ", route)
-    for i in range(len(net_dict)):
+    cmap = plt.get_cmap('gnuplot')
+    colors = [cmap(i) for i in np.linspace(0, 1, len(net_dict))]
+    for i, color in enumerate(colors, start=0):
         route[i] = np.array(route[i])
         
         line = art3d.Line3D(route[i][0:len(route[i]), 0], route[i][0:len(route[i]), 1], route[i][0:len(route[i]), 2], 
-            marker = ' ')
+            marker = ' ', color= color)
         ax.add_line(line)
     
-    # plt.axis('off')
+    
     lis = [i for i in range(0, board.length + 1)]
     # ax.set_xlim(0, board.width)
     ax.set_xticks(lis, minor=False)
