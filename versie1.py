@@ -9,12 +9,14 @@ from helper_functions import *
 chip_number = 0
 netlist_number = 1
 
+
 class net:
     def __init__(self, start, destination):
         self.wires = []
         self.start = start
         self.destination = destination
         cost = 0
+
 
 class board:
     def __init__(self, gates):
@@ -59,54 +61,10 @@ def read_data(chip_number, netlist_number):
     netlist_filepath = "gates&netlists/chip_" + ch + "/netlist_" + nn + ".csv"
     with open(netlist_filepath) as input:
         netlist_data = [line for line in csv.reader(input)]
-    
-    print("Netlist data: ")
-    print(netlist_data)
 
     netlist = [tuple(map(int, net)) for net in netlist_data[1:]]
 
     return gates, gatelocations, netlist
-
-
-gates, gatelocations, netlist = read_data(chip_number, netlist_number)
-
-print("Netlist: ", netlist)
-print("Gates: ", gates)
-print("Gate locations: ", gatelocations)
-
-random.shuffle(netlist)
-print("Netlist na shuffelen: ")
-print(netlist)
-
-bord1 = board(gates)
-
-print("Bord breedte: ", bord1.width)
-print("Bord lengte: ", bord1.length)
-print("")
-
-
-
-# Niet echt meer nodig als we een betere draw hebben
-# # Basic printing function to visualize board configuration
-# def print_board(board):
-#     for y in range(board.length - 1, -1, -1):
-#         row = []
-
-#         for x in range(0, board.width):
-#             al_geprint = False
-
-#             for gate in board.gates:
-                
-#                 if (gate[1], gate[2]) == (x, y):
-#                     print("", gate[0], "", end = '')
-#                     al_geprint = True
-            
-#             if al_geprint == False:            
-#                 print(" + ", end = '')
-
-#         print("\n")
-
-# print_board(bord1)
 
 
 # Create a path on board from loc to dest
@@ -253,15 +211,6 @@ def get_origin(path):
         return False
 
 
-# print(netlist)
-test = make_net(bord1, gates[netlist[0][0]], gates[netlist[0][1]], netlist)
-print(test.nets)
-
-
-# Hardcode voorbeeld om te kijken of de onderstaande functie wel goed nets van
-# een bord kan printen.
-# bord1.nets[(1, 2)] = [(1,5),(2,5),(3,5),(4,5),(5,5),(6,5)]
-
 # Function that gives a text output of a solution (board) as prescribed in
 # the assignment. 
 def output_board(board, netlist, chip_number, netlist_number):
@@ -280,11 +229,10 @@ def output_board(board, netlist, chip_number, netlist_number):
 
 
 
+gates, gatelocations, netlist = read_data(chip_number, netlist_number)
+random.shuffle(netlist)
+bord1 = board(gates)
+make_net(bord1, gates[netlist[0][0]], gates[netlist[0][1]], netlist)
+draw(bord1, gates, netlist)
 
-draw3d(bord1, gates, netlist)
-
-
-
-# print("\nVoorgeschreven output")
-# output_board(bord1, netlist, chip_number, netlist_number)
 
