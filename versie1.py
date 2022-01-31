@@ -7,7 +7,7 @@ from helper_functions import *
 
 
 chip_number = 0
-netlist_number = 1
+netlist_number = 3
 
 
 class net:
@@ -34,6 +34,7 @@ class board:
         # x & y + 2 to create extra ring of space around chip print
         self.width = max_x + 2
         self.length = max_y + 2
+        self.height = 7
         self.gates = gates
         self.nets = {}
         self.cost = 0
@@ -50,7 +51,7 @@ def read_data(chip_number, netlist_number):
     with open(print_filepath) as input:
         gate_data = [line for line in csv.reader(input)]
 
-    gates = dict([(int(gatenum), (int(gate_x), int(gate_y))) 
+    gates = dict([(int(gatenum), (int(gate_x), int(gate_y), 0)) 
             for gatenum, gate_x, gate_y in gate_data[1:]])
 
     gatelocations = set()
@@ -62,7 +63,7 @@ def read_data(chip_number, netlist_number):
     with open(netlist_filepath) as input:
         netlist_data = [line for line in csv.reader(input)]
 
-    netlist = [tuple(map(int, net)) for net in netlist_data[1:]]
+    netlist = [tuple(map(int, net)) for net in netlist_data[1:] if net != []]
 
     return gates, gatelocations, netlist
 
@@ -139,28 +140,38 @@ def get_moves(board, path, origin):
     # print("Getting moves from location ", cur_location)
 
     if origin != "S" and cur_location[1] < board.length - 1:
-        north = (cur_location[0], cur_location[1] + 1)
+        north = (cur_location[0], cur_location[1] + 1, cur_location[2])
     else:
         north = False
     # print("North: ", north)
 
     if origin != "W" and cur_location[0] < board.width - 1:
-        east = (cur_location[0] + 1, cur_location[1])
+        east = (cur_location[0] + 1, cur_location[1], cur_location[2])
     else:
         east = False
     # print("East: ", east)
 
     if origin != "N" and cur_location[1] > 0:
-        south = (cur_location[0], cur_location[1] - 1)
+        south = (cur_location[0], cur_location[1] - 1, cur_location[2])
     else:
         south = False
     # print("South: ", south)
 
     if origin != "E" and cur_location[0] > 0:
-        west = (cur_location[0] - 1, cur_location[1])
+        west = (cur_location[0] - 1, cur_location[1], cur_location[2])
     else:
         west = False
     # print("West: ", west)
+
+    if origin != "u" and cur_location[0] > 0:
+        up = ((cur_location[0], cur_location[1], cur_location[2] + 1))
+    else:
+        up = False
+
+    if origin != "d" and cur_location[0] > 0:
+        down = ((cur_location[0], cur_location[1], cur_location[2] - 1))
+    else:
+        down = False
 
     # prevent path from visiting already visted coordinates
     for coord in path:
@@ -176,6 +187,12 @@ def get_moves(board, path, origin):
         if coord == west:
             # print("coord ", coord, "already visited")
             west = False
+        if coord == up:
+            # print("coord ", coord, "already visited")
+            up = False
+        if coord == down:
+            # print("coord ", coord, "already visited")
+            down = False
 
     # Prevent moves from entering coordinates already used by other nets in board
     for net in board.nets:
@@ -191,8 +208,12 @@ def get_moves(board, path, origin):
             south = False
         if west in existing_net:
             west = False
+        if up in existing_net:
+            up = False
+        if down in existing_net:
+            down = False
 
-    return north, east, south, west
+    return north, east, south, west, up, down
 
 
 # Check what the last direction the path has taken is.
@@ -233,6 +254,6 @@ gates, gatelocations, netlist = read_data(chip_number, netlist_number)
 random.shuffle(netlist)
 bord1 = board(gates)
 make_net(bord1, gates[netlist[0][0]], gates[netlist[0][1]], netlist)
-draw(bord1, gates, netlist)
+draw3d(bord1, gates, netlist)
 
 
