@@ -2,12 +2,13 @@ from sys import getallocatedblocks
 import numpy as np
 import random
 import csv
+import time
 
 from helper_functions import *
 
 
 chip_number = 0
-netlist_number = 3
+netlist_number = 2
 
 
 class net:
@@ -85,6 +86,7 @@ def make_net(board, loc, dest, objectives):
             # backtracking and getting stuck in a loop.
             origin = get_origin(path)
             moves = get_moves(board, path, origin)
+        
 
             # For each spot found that can be moved to, add a new 
             # path (= old path + spot) to the collection of paths
@@ -98,6 +100,7 @@ def make_net(board, loc, dest, objectives):
                     # configuration is found, so return the board.
                     if move == dest:
                         board.nets[objectives[0]] = new_path
+                        draw3d(bord1, gates, netlist)
                         print("found path: ")
                         print(new_path)
                         print("")
@@ -117,6 +120,7 @@ def make_net(board, loc, dest, objectives):
                     # Except if move is about to pass a gate
                     elif move not in gatelocations:
                         new_paths.append(new_path)
+                    
 
         if new_paths == hypothetical_paths:
             print("Found no new paths")
@@ -125,6 +129,7 @@ def make_net(board, loc, dest, objectives):
         # update hypothetical paths
         hypothetical_paths = [] + new_paths
 
+    
     # Moving is no longer possible
     return False
 
@@ -156,19 +161,19 @@ def get_moves(board, path, origin):
     else:
         south = False
     # print("South: ", south)
-
+  
     if origin != "E" and cur_location[0] > 0:
         west = (cur_location[0] - 1, cur_location[1], cur_location[2])
     else:
         west = False
     # print("West: ", west)
 
-    if origin != "u" and cur_location[0] > 0:
+    if origin != "U" and cur_location[2] < board.height - 1:
         up = ((cur_location[0], cur_location[1], cur_location[2] + 1))
     else:
         up = False
 
-    if origin != "d" and cur_location[0] > 0:
+    if origin != "D" and cur_location[2] > 0:
         down = ((cur_location[0], cur_location[1], cur_location[2] - 1))
     else:
         down = False
@@ -194,12 +199,15 @@ def get_moves(board, path, origin):
             # print("coord ", coord, "already visited")
             down = False
 
+   
+
     # Prevent moves from entering coordinates already used by other nets in board
     for net in board.nets:
         # [1:-1] so it can still visit its destination gate even if that gate
         # has been visited once before by another net.
         existing_net = board.nets[net][1:-1]
 
+    
         if north in existing_net:
             north = False
         if east in existing_net:
@@ -212,6 +220,7 @@ def get_moves(board, path, origin):
             up = False
         if down in existing_net:
             down = False
+
 
     return north, east, south, west, up, down
 
@@ -228,6 +237,10 @@ def get_origin(path):
         return "N"
     elif path[-1][1] < path[-2][1]:
         return "S"
+    elif path[-1][2] > path[-2][2]:
+        return "U"
+    elif path[-1][2] < path[-2][2]:
+        return "D"
     else:
         return False
 
@@ -251,9 +264,14 @@ def output_board(board, netlist, chip_number, netlist_number):
 
 
 gates, gatelocations, netlist = read_data(chip_number, netlist_number)
-random.shuffle(netlist)
 bord1 = board(gates)
+random.shuffle(netlist)
+start_time = time.time()
 make_net(bord1, gates[netlist[0][0]], gates[netlist[0][1]], netlist)
+print(netlist)
+print("--- %s seconds ---" % (time.time() - start_time))
+
 draw3d(bord1, gates, netlist)
+
 
 
