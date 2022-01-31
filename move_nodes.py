@@ -60,13 +60,10 @@ def get_moves(board, current_node, gatelocations_except_goal, goal):
     # not allowed so set move to false.
     # Checking for overlap when moving to, or from a gate is different from
     # Normal overlap checking, since the starting node is never an intersection.
-    # Overlap can still occur however.
-    # To prevent overlap, compare the ends of nets on board to current move.
+    # Overlap can still occur however. To prevent compare the end & start of 
+    # nets on board to current move.
     for net in board.nets:
         if board.nets[net] != False:
-            # [1:-1] so it can still visit its destination gate even if that gate
-            # has been visited once before by another net.
-
             existing_net = board.nets[net]
             wire_set = set(existing_net)
             ends_of_net = set((existing_net[:2] + existing_net[-2:]))

@@ -4,7 +4,7 @@ from sys import getallocatedblocks
 import time
 
 from helper_functions import *
-from move import *
+from move_nodes import *
 from classes import *
 
 
