@@ -1,6 +1,6 @@
-from audioop import avg
-from queue import Empty
-from sys import getallocatedblocks
+# from audioop import avg
+# from queue import Empty
+# from sys import getallocatedblocks
 import time
 
 from helper_functions import *
@@ -13,7 +13,9 @@ chip_number = 0
 netlist_number = 1
 
 
-
+# Preprocessing
+# Collect input data and create required structures.
+# Also the ordering of the netlist is decided.
 gates, gatelocations, netlist = read_data(chip_number, netlist_number)
 
 print("Netlist: ", netlist)
@@ -28,7 +30,6 @@ print("")
 
 # Netlist sorteren....
 netlist = sort_netlist_euc_dist(netlist, gates)
-# Netlist hardcode voorbeeld
 print("\nNetlist na sorteren: ")
 print(netlist)
 

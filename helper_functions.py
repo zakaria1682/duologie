@@ -109,6 +109,12 @@ def extract_path(node):
 
 
 
+# Return true if coord is a gate (if coord is in the set gatelocations)
+def gate(coord, gatelocations):
+    return (coord in gatelocations)
+
+
+
 # function that graphically displays the nets of a solved chip-print
 def draw(board, gates, netlist):
     route = []
@@ -147,6 +153,9 @@ def draw(board, gates, netlist):
     plt.savefig("output_2d.png")
 
 
+
+
+
 # Function that gives a text output of a solution (board) as prescribed in
 # the assignment. 
 def output_board(board, netlist, chip_number, netlist_number):
@@ -163,13 +172,14 @@ def output_board(board, netlist, chip_number, netlist_number):
     print("chip_" + str(chip_number) + "_net_" + str(netlist_number) + ","
         + str(board.cost))
 
-def gate(coord, gatelocations):
-    return (coord in gatelocations)
+
+
+
 
 
 # function that graphically displays the steps and saves the graphs to the move 
 # directory in 3d.
-def draw3d(board, gates, netlist):
+def draw3d(board):
     route = []
     net_dict = board.nets
 
@@ -193,8 +203,8 @@ def draw3d(board, gates, netlist):
 
     # plot gates
     gates2 = []
-    for i in range(len(gates)):
-        gates2.append(gates[i + 1])
+    for i in range(len(board.gates)):
+        gates2.append(board.gates[i + 1])
         ax.text(list(gates2[i])[0], list(gates2[i])[1], 0,  str(i + 1), 
         color="red", fontsize=14)
     gates2 = np.array(gates2)
