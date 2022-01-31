@@ -2,7 +2,7 @@ import matplotlib
 import numpy as np
 from matplotlib import pyplot as plt
 import mpl_toolkits.mplot3d.art3d as art3d
-
+import csv
 
 
 # Helper_functions.py contain functions that serve the move functions and the

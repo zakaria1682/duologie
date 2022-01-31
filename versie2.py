@@ -1,9 +1,6 @@
 from audioop import avg
 from queue import Empty
 from sys import getallocatedblocks
-import random
-import csv
-
 import time
 
 from helper_functions import *
@@ -14,7 +11,6 @@ from classes import *
 
 chip_number = 0
 netlist_number = 1
-
 
 
 
