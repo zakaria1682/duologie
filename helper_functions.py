@@ -4,29 +4,72 @@ from matplotlib import pyplot as plt
 import mpl_toolkits.mplot3d.art3d as art3d
 
 
-# function that scores possible moves manhattan style
-def manhattan_distance(starting_point, possible_move, destination):
 
-    g = (abs((possible_move[0] - starting_point[0]))
-         + abs((possible_move[1] - starting_point[1])))
-    h = (abs(destination[0] - possible_move[0]) 
-        + abs(destination[1] - possible_move[1]))
-
-    successor_g = g + 1
-    successor_h = h
-
-    successor_f = successor_h + successor_g 
-
-    return successor_g, successor_h, successor_f
+# Helper_functions.py contain functions that serve the move functions and the
+# main .py files of the used algorithm
+################################################################################
 
 
+
+# Read chip data of csv file input
+# Function reads the coordinates of the gates on the print, and the netlist
+# for which a viable net configuration has to be found. Returns a set of 
+# locations for the board that are occupied by gates, and a dictionary linking
+# those coordinates to gate numbers, and a list containing the netlist.
+def read_data(chip_number, netlist_number):
+    cn = str(chip_number)
+    nn = str(netlist_number)
+
+    print_filepath = "gates&netlists/chip_" + cn + "/print_" + cn + ".csv"
+    with open(print_filepath) as input:
+        gate_data = [line for line in csv.reader(input)]
+
+    # Gates are always at bottom layer of print, so their z is always 0.
+    gates = dict([(int(gatenum), (int(gate_x), int(gate_y), 0)) 
+            for gatenum, gate_x, gate_y in gate_data[1:]])
+
+    gatelocations = set()
+
+    for gate in gates:
+        gatelocations.add(gates[gate])
+
+    netlist_filepath = "gates&netlists/chip_" + cn + "/netlist_" + nn + ".csv"
+    with open(netlist_filepath) as input:
+        netlist_data = [line for line in csv.reader(input)]
+    
+    print("Netlist data: ")
+    print(netlist_data)
+
+    # Create tuples of requested connections in netlist data and prevent
+    # empty read lines from being added to result netlist.
+    netlist = [tuple(map(int, net)) for net in netlist_data[1:] if net != []]
+
+    return gates, gatelocations, netlist
+
+
+
+# Return the manhattan distance between 2 coördinates in 2d space
+def manhattan_distance(point_a, point_b):
+    return abs(point_a[0] - point_b[0]) + abs(point_a[1] - point_b[1])
+
+
+
+# Return the manhattan distance between 2 coördinates in 3d space
+def manhattan_distance3d(point_a, point_b):
+    return (abs(point_a[0] - point_b[0]) 
+        + abs(point_a[1] - point_b[1])
+        + abs(point_a[2] - point_b[2]))
+
+
+
+# Function that calculates the euclidian between 2 coördinates in 2d space.
 def euclidian_distance(point_a, point_b):
     result = (abs((point_a[0] - point_b[0]))**2 
         + abs((point_a[1] - point_b[1]))**2)**0.5
 
     return result
 
-
+# Function that calculates the euclidian between 2 coördinates in 3d space.
 def euc_3d(point_a, point_b):
     result = (abs((point_a[0] - point_b[0]))**2 
         + abs((point_a[1] - point_b[1])) 
@@ -35,13 +78,38 @@ def euc_3d(point_a, point_b):
     return result
 
 
-def sort_netlist(netlist, gates):
+
+# Function that sorts the requested gate-connections of a netlist based on the
+# euclidian distance between the gates per connection.
+def sort_netlist_euc_dist(netlist, gates):
     netlist.sort(key = lambda net: euclidian_distance(gates[net[0]], gates[net[1]]))
     return netlist
 
 
-# function that graphically displays the steps and saves the graphs to the move 
-# directory.
+
+# Return the average value of a list
+def average(lst):
+    return sum(lst) / len(lst)
+
+
+
+# Extract a path from a node to tree root by traversing parents until a node
+# without parents is found. Wanted path is from root to node, so the path
+# collected is in reverse. Reverse path before returning.
+def extract_path(node):
+    # print("found path to ", node.location)
+    result_path = [node.location]
+
+    while node.parent != None:
+        result_path.append(node.parent.location)
+        node = node.parent
+    result_path.reverse()
+
+    return result_path
+
+
+
+# function that graphically displays the nets of a solved chip-print
 def draw(board, gates, netlist):
     route = []
     net_dict = board.nets
