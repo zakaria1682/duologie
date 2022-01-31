@@ -7,19 +7,14 @@ import time
 
 # import helper_functions
 from helper_functions import *
+from move import *
 
 chip_number = 1
 netlist_number = 6
 
-# class net:
-#     def __init__(self, start, destination):
-#         self.wires = []
-#         self.start = start
-#         self.destination = destination
-#         cost = 0
 
 class board:
-    def __init__(self, gates):
+    def __init__(self, gates, gatelocations):
         # Get max x and y values of outermost chips
         max_x, max_y = (0, 0)
         for gate in gates:
@@ -36,6 +31,7 @@ class board:
         self.length = max_y + 2
         self.height = 7
         self.gates = gates
+        self.gatelocations = gatelocations
         self.nets = {}
         self.cost = 0
 
@@ -55,7 +51,9 @@ class node:
 
 # read chip data of csv file input
 # Function reads the coordinates of the gates on the print, and the netlist
-# for which a viable net configuration has to be found.
+# for which a viable net configuration has to be found. Returns a set of 
+# locations for the board that are occupied by gates, and a dictionary linking
+# those coordinates to gate numbers, and a list containing the netlist.
 def read_data(chip_number, netlist_number):
     ch = str(chip_number)
     nn = str(netlist_number)
@@ -90,7 +88,7 @@ print("Netlist: ", netlist)
 print("Gates: ", gates)
 print("Gate locations: ", gatelocations)
 
-bord1 = board(gates)
+bord1 = board(gates, gatelocations)
 
 print("Bord breedte: ", bord1.width)
 print("Bord lengte: ", bord1.length)
@@ -111,7 +109,7 @@ print(netlist)
 def make_net(board, start, goal):
     print("Finding path from ", start, " to ", goal, "...")
     gatelocations_except_goal = set()
-    gatelocations_except_goal = (gatelocations - set([goal]))
+    gatelocations_except_goal = (board.gatelocations - set([goal]))
     starting_node = node(start, None)
 
     # List containing all possible locations to be moved from.
@@ -185,89 +183,89 @@ def make_net(board, start, goal):
 #   Moves that result in the location of a gate that is not the goal gate
 # Also, if a move results in an already visited location by other nets on board,
 # give that move a higher cost to reduce it's priority.
-def get_moves(board, current_node, gatelocations_except_goal, goal):
-    # print("")
-    cur_location = current_node.location
-    # print("Getting moves from location ", cur_location)
+# def get_moves(board, current_node, gatelocations_except_goal, goal):
+#     # print("")
+#     cur_location = current_node.location
+#     # print("Getting moves from location ", cur_location)
 
-    north = ((cur_location[0], cur_location[1] + 1, cur_location[2]), 1)
-    east = ((cur_location[0] + 1, cur_location[1], cur_location[2]), 1)
-    south = ((cur_location[0], cur_location[1] - 1, cur_location[2]), 1)
-    west = ((cur_location[0] - 1, cur_location[1], cur_location[2]), 1)
-    up = ((cur_location[0], cur_location[1], cur_location[2] + 1), 1)
-    down = ((cur_location[0], cur_location[1], cur_location[2] - 1), 1)
+#     north = ((cur_location[0], cur_location[1] + 1, cur_location[2]), 1)
+#     east = ((cur_location[0] + 1, cur_location[1], cur_location[2]), 1)
+#     south = ((cur_location[0], cur_location[1] - 1, cur_location[2]), 1)
+#     west = ((cur_location[0] - 1, cur_location[1], cur_location[2]), 1)
+#     up = ((cur_location[0], cur_location[1], cur_location[2] + 1), 1)
+#     down = ((cur_location[0], cur_location[1], cur_location[2] - 1), 1)
 
-    if cur_location[1] >= board.length - 1:
-        north = False
+#     if cur_location[1] >= board.length - 1:
+#         north = False
 
-    if cur_location[0] >= (board.width - 1):
-        east = False 
+#     if cur_location[0] >= (board.width - 1):
+#         east = False 
     
-    if cur_location[1] <= 0:
-        south = False
+#     if cur_location[1] <= 0:
+#         south = False
 
-    if cur_location[0] <= 0:
-        west = False
+#     if cur_location[0] <= 0:
+#         west = False
 
-    if cur_location[2] >= (board.height - 1):
-        up = False
+#     if cur_location[2] >= (board.height - 1):
+#         up = False
 
-    if cur_location[2] <= 0:
-        down = False
+#     if cur_location[2] <= 0:
+#         down = False
 
-    moves = [north, east, south, west, up, down]
+#     moves = [north, east, south, west, up, down]
 
-    # Prevent move from going towards a gate that is not its objective
-    for i in range(0, len(moves)):
-        if moves[i] != False:
-            if moves[i][0] in gatelocations_except_goal:
-                moves[i] == False
+#     # Prevent move from going towards a gate that is not its objective
+#     for i in range(0, len(moves)):
+#         if moves[i] != False:
+#             if moves[i][0] in gatelocations_except_goal:
+#                 moves[i] == False
     
-    # Prevent moves from going backwards (towards their parent)
-    if current_node.parent != None:
-        for i in range(0, len(moves)):
-            if moves[i] != False:
-                if moves[i][0] == current_node.parent.location:
-                    moves[i] = False
+#     # Prevent moves from going backwards (towards their parent)
+#     if current_node.parent != None:
+#         for i in range(0, len(moves)):
+#             if moves[i] != False:
+#                 if moves[i][0] == current_node.parent.location:
+#                     moves[i] = False
 
-    # Prevent moves from entering coordinates already used by other nets in 
-    # board. Collect all present wires on board. If wire is already in use,
-    # current move is making an intersection. Set cost to 300.
-    # If parent is also already an intersection, move has overlap. Overlap is
-    # not allowed so set move to false.
-    # Checking for overlap when moving to, or from a gate is different from
-    # Normal overlap checking, since the starting node is never an intersection.
-    # Overlap can still occur however.
-    # To prevent overlap, compare the ends of nets on board to current move.
-    for net in board.nets:
-        if board.nets[net] != False:
-            # [1:-1] so it can still visit its destination gate even if that gate
-            # has been visited once before by another net.
+#     # Prevent moves from entering coordinates already used by other nets in 
+#     # board. Collect all present wires on board. If wire is already in use,
+#     # current move is making an intersection. Set cost to 300.
+#     # If parent is also already an intersection, move has overlap. Overlap is
+#     # not allowed so set move to false.
+#     # Checking for overlap when moving to, or from a gate is different from
+#     # Normal overlap checking, since the starting node is never an intersection.
+#     # Overlap can still occur however.
+#     # To prevent overlap, compare the ends of nets on board to current move.
+#     for net in board.nets:
+#         if board.nets[net] != False:
+#             # [1:-1] so it can still visit its destination gate even if that gate
+#             # has been visited once before by another net.
 
-            existing_net = board.nets[net]
-            wire_set = set(existing_net)
-            ends_of_net = set((existing_net[:2] + existing_net[-2:]))
+#             existing_net = board.nets[net]
+#             wire_set = set(existing_net)
+#             ends_of_net = set((existing_net[:2] + existing_net[-2:]))
             
-            a_is_gate = gate(current_node.location, gatelocations)
+#             a_is_gate = gate(current_node.location, gatelocations)
 
-            for i in range(0, len(moves)):
-                if moves[i] != False and moves[i][0] in wire_set:
-                    b_is_gate = gate(moves[i][0], gatelocations)
+#             for i in range(0, len(moves)):
+#                 if moves[i] != False and moves[i][0] in wire_set:
+#                     b_is_gate = gate(moves[i][0], gatelocations)
                     
-                    if a_is_gate or b_is_gate:
-                        # Check for overlap with start or end of existing net                    
-                        if (current_node.location in ends_of_net 
-                            and moves[i][0] in ends_of_net):
-                            moves[i] = False
-                        elif not b_is_gate:
-                            moves[i] = (moves[i][0], 300)
-                    elif current_node.intersection == True:
-                        # overlap
-                        moves[i] = False
-                    else:
-                        moves[i] = (moves[i][0], 300)
+#                     if a_is_gate or b_is_gate:
+#                         # Check for overlap with start or end of existing net                    
+#                         if (current_node.location in ends_of_net 
+#                             and moves[i][0] in ends_of_net):
+#                             moves[i] = False
+#                         elif not b_is_gate:
+#                             moves[i] = (moves[i][0], 300)
+#                     elif current_node.intersection == True:
+#                         # overlap
+#                         moves[i] = False
+#                     else:
+#                         moves[i] = (moves[i][0], 300)
 
-    return moves
+#     return moves
 
 
 
