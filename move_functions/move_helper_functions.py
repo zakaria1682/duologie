@@ -51,3 +51,28 @@ def gates_and_surroundings(board, objective):
                                              if x != False]))
 
     return locations
+
+
+# Return a set of locations in use by other nets on the board, except the final
+# coordinates of those nets, since they are locations of gates and gates
+# should still be accessable if they are for example a goal.
+def used_locations(board):
+    occupied = set()
+
+    for net in board.nets:
+        print("Adding net ", net, " with coordinates ", board.nets[net][1:-1])
+        occupied = occupied.union(set(board.nets[net][1:-1]))
+
+    print("Locations in use by other nets: ")
+    print(occupied)
+
+    return occupied
+
+
+# Function that bundles above helper functions and returns locations on board
+# in use by other nets or occupied by the surroundings of 
+def impassable_terrain(board, objective):
+    return used_locations.union(gates_and_surroundings)
+
+
+

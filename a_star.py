@@ -4,7 +4,7 @@
 import time
 
 from helper_functions import *
-from move_nodes import *
+from move_functions.move_nodes import *
 from classes import *
 
 

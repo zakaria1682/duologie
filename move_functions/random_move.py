@@ -21,6 +21,8 @@ def get_random_move(board, path, goal, objective, impassable_terrain):
     illegal = set(path).union(impassable_terrain)
 
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!Prevendeer intersectie!!!
+    
+
 
     # prevent path from visiting non-legal coordinates
     for i in range(0, len(moves)):

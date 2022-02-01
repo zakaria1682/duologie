@@ -64,7 +64,11 @@ def make_random_net(board, objective):
 
 
 
-# print(make_random_net(bord1, (1, 2)))
+test_net = [(1, 2, 0), (2, 2, 0), (2, 3, 0), (2, 4, 0)]
+bord1.nets[(1, 2)] = test_net
+test_net2 = [(4, 4, 1), (4, 4, 2), (4, 4, 3), (4, 4, 4)]
+bord1.nets[(3, 5)] = test_net2
+
 
 
 def solve_board_random(board, netlist, tries):
@@ -78,7 +82,7 @@ def solve_board_random(board, netlist, tries):
 
             if net != False:
                 print("Found path ", net)
-                time.sleep(0.3)
+                # time.sleep(0.3)
                 board.nets[netlist[i]] = net
                 made_net = True
             
@@ -95,8 +99,13 @@ def solve_board_random(board, netlist, tries):
 
 
 
-solve_board_random(bord1, netlist, 60)
+# solve_board_random(bord1, netlist, 60)
 
 print("\nBoard nets: \n", bord1.nets)
 
-draw3d(bord1)
+print("")
+occ = used_locations(bord1)
+
+
+
+# draw3d(bord1)
