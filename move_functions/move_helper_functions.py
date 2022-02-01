@@ -60,11 +60,11 @@ def used_locations(board):
     occupied = set()
 
     for net in board.nets:
-        print("Adding net ", net, " with coordinates ", board.nets[net][1:-1])
+        # print("Adding net ", net, " with coordinates ", board.nets[net][1:-1])
         occupied = occupied.union(set(board.nets[net][1:-1]))
 
-    print("Locations in use by other nets: ")
-    print(occupied)
+    # print("Locations in use by other nets: ")
+    # print(occupied)
 
     return occupied
 
@@ -72,7 +72,7 @@ def used_locations(board):
 # Function that bundles above helper functions and returns locations on board
 # in use by other nets or occupied by the surroundings of 
 def impassable_terrain(board, objective):
-    return used_locations.union(gates_and_surroundings)
+    return used_locations(board).union(gates_and_surroundings(board, objective))
 
 
 
