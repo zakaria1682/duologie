@@ -17,5 +17,12 @@ Door middel van test_runs.py kunnen de gemaakte algoritmes worden aangeroepen.
 Bij het aanroepen worden een aantal argumenten gevraagd die de uitkomst van de runs beïnvloeden.
 De argumenten zijn als volgt gestructureerd:
 
-<p style="font-family:arial">python test_runs.py<p>
+<p style="font-family:arial">python3 test_runs.py a n tt tpr<p>
+waarbij:
 <ol>
+  <li>a: Algorithm. Hier hoort de naam van de file met daarin het gewenste algoritme om getest te worden</li>
+  <li>n: Netlist. Hier hoort het nummer van de netlist waar het algoritme op getest moet worden.
+         test_runs.py bepaalt automatisch welke chip-print hierbij hoort.</li>
+  <li>tt: Total Time: Hier hoort de totale tijd waarin het algoritme herhaaldelijk uitgevoert moet worden.</li>
+  <li>tpr: Time Per Run: Hier hoort de maximale tijd die elke uitvoer van het algoritme heeft om tot één oplossing te komen</li>
+</ol>
