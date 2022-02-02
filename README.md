@@ -36,11 +36,13 @@ test_runs.py roept het algoritme herhaaldelijk aan, en in het bestand van het al
 welke netlist is gegeven het algoritme één maal uitgevoerd. Hierbij wordt de tijd gemeten die nodig is voor enkel
 en alleen het solven. Vervolgens worden statistieken van het bord verzameld.<br>
 
-De statistieken die worden verzameld: <br>
-Excecution time per run,<br>
-Hoeveelheid afgemaakte nets versus totale aantal nets<br>
-Cost van oplossing<br>
-<br>
+De statistieken die worden verzameld:
+<ul>
+  <li>Excecution time per run</li>
+  <li>Hoeveelheid afgemaakte nets versus totale aantal nets</li>
+  <li>Cost van oplossing</li>
+<ul>
+
 Daarnaast wordt ook het beste geval van elk van deze statistieken verzameld,
 en de best gevonden oplossing (rekening houdend met elk van deze statistieken).<br>
 
