@@ -72,7 +72,7 @@ op een nieuwe regel worden afgeschreven in output/output.csv.
 Enkele gemiddelden en de beste statistieken worden ook nog uitgeschreven naar
 stdout.
 
-## Beschrijving van de algoritmen
+# Beschrijving van de algoritmen
 
-# Breadth-first search (BFS)
+## Breadth-first search (BFS)
 Het BFS algoritme is een zoekalgoritme dat vanaf een beginpunt kijkt bij elke vertakking of het de oplossing is en vervolgens voor elk van die vertakkingen dit proces uitvoert totdat de gewenste oplossing gevonden is. Het zoek algoritme breidt op deze manieer alle mogelijkheden van paden uit in alle vertakkings richtingen en slaat deze paden op totdat het einddoel is bereikt. Het algoritme houd er rekening mee dat paden elkaar niet kruizen en er dus ook geen overlap van paden kan ontstaan. Tevens kunnen paden niet over gates heen lopen. Verder gebruikt dit zoek algoritme geen informatie over het zoekprobleem tijdens het zoeken.
