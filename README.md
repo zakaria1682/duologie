@@ -41,7 +41,7 @@ De statistieken die worden verzameld:
   <li>Excecution time per run</li>
   <li>Hoeveelheid afgemaakte nets versus totale aantal nets</li>
   <li>Cost van oplossing</li>
-<ul>
+</ul>
 
 Daarnaast wordt ook het beste geval van elk van deze statistieken verzameld,
 en de best gevonden oplossing (rekening houdend met elk van deze statistieken).<br>
