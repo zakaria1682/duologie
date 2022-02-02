@@ -113,8 +113,15 @@ make_net(chip_board,
          chip_board.gates[netlist[0][1]], 
          netlist)
 execution_time = (time.time() - start_time)
+statistics = get_board_statistics(chip_board)
+
 
 csvfile = open('output/output.csv', 'a')
 csvfile.write("\n")
-csvfile.write(str(execution_time))
+# csvfile.write(str(execution_time))
+string = str(statistics[0]) + "/" + str(len(netlist))
+csvfile.write(f"{execution_time},{string},{statistics[1]}")
+
 csvfile.close()
+
+
