@@ -5,26 +5,18 @@ from helper_functions import *
 from move_functions.move_nodes import *
 from classes import *
 
-print('Number of arguments:', len(sys.argv), 'arguments.')
-print('Argument List:', str(sys.argv))
+# print('Number of arguments:', len(sys.argv), 'arguments.')
+# print('Argument List:', str(sys.argv))
 
 
 chip_number = sys.argv[1]
 netlist_number = sys.argv[2]
 
 
-# Preprocessing
-# Collect input data and create required structures.
-# Also the ordering of the netlist is decided.
-gates, gatelocations, netlist = read_data(chip_number, netlist_number)
-bord1 = board(gates, gatelocations)
 
 
-# Netlist sorteren....
-# netlist = sort_netlist_euc_dist(netlist, gates)
-netlist = sort_netlist_center(bord1, netlist)
-print("\nNetlist na sorteren: ")
-print(netlist)
+
+
 
 
 # Find shortest path from start to goal.
@@ -104,37 +96,29 @@ def solve_board(board, netlist):
 
 
 
-# execution_times = []
-
-# for i in range(0, 100):
-#     print(i, "%")
-#     start_time = time.time()
-
-#     bord = board(gates, gatelocations)
-#     solve_board(bord, netlist)
-
-#     exec_time = (time.time() - start_time)
-
-#     execution_times.append(exec_time)
-
-
-# print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n")
-# print("Average execution time: ")
-# average_exec = average(execution_times)
-# print(average_exec)
-# print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n")
 
 
 
-# print(new_netlist)
+# The execution of the solve
+# First read data of chip-print and netlist
+# Then start timing and execute solve
+# Then write execution time to output.csv
+gates, gatelocations, netlist = read_data(chip_number, netlist_number)
 
-solve_board(bord1, netlist)
-# print("Gemaakte nets: ")
-# for net in bord1.nets:
-#     print("\n", net, "\n########################")
-#     print(bord1.nets[net])
-draw3d(bord1)
+chip_board = board(gates, gatelocations)
+# sort netlist
+netlist = sort_netlist_center(chip_board, netlist)
+
+start_time = time.time()
+solve_board(chip_board, netlist)
+execution_time = (time.time() - start_time)
+
+csvfile = open('output/output.csv', 'a')
+csvfile.write("\n")
+csvfile.write(str(execution_time))
+csvfile.close()
 
 
-get_board_statistics(bord1)
+
+# get_board_statistics(bord1)
 

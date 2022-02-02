@@ -1,29 +1,14 @@
 from helper_functions import *
 from move_functions.random_move import *
 from classes import *
+import sys
 
 import time
 
 
 
-chip_number = 0
-netlist_number = 1
-
-# Preprocessing
-# Collect input data and create required structures.
-# Also the ordering of the netlist is decided.
-gates, gatelocations, netlist = read_data(chip_number, netlist_number)
-
-print("Netlist: ", netlist)
-print("Gates: ", gates)
-print("Gate locations: ", gatelocations)
-
-bord1 = board(gates, gatelocations)
-
-print("Bord breedte: ", bord1.width)
-print("Bord lengte: ", bord1.length)
-print("")
-
+chip_number = sys.argv[1]
+netlist_number = sys.argv[2]
 
 
 
@@ -84,13 +69,22 @@ def solve_board_random(board, netlist, tries):
 
 
 
-solve_board_random(bord1, netlist, 16000)
 
-print("\nBoard nets: \n", bord1.nets)
+# The execution of the solve
+# First read data of chip-print and netlist
+# Then start timing and execute solve
+# Then write execution time to output.csv
+gates, gatelocations, netlist = read_data(chip_number, netlist_number)
 
-print("")
-occ = used_locations(bord1)
+chip_board = board(gates, gatelocations)
+# sort netlist
+netlist = sort_netlist_center(chip_board, netlist)
 
+start_time = time.time()
+solve_board_random(chip_board, netlist, 10000)
+execution_time = (time.time() - start_time)
 
-
-draw3d(bord1)
+csvfile = open('output/output.csv', 'a')
+csvfile.write("\n")
+csvfile.write(str(execution_time))
+csvfile.close()

@@ -1,7 +1,7 @@
-from sys import getallocatedblocks
-import numpy as np
-import random
-import csv
+import sys
+# import numpy as np
+# import random
+# import csv
 import time
 
 from helper_functions import *
@@ -10,8 +10,8 @@ from move_functions.random_move import *
 from move_functions.move_BFS import *
 
 
-chip_number = 0
-netlist_number = 1
+chip_number = sys.argv[1]
+netlist_number = sys.argv[2]
 
 
 # Create a path on board from loc to dest
@@ -46,10 +46,6 @@ def make_net(board, loc, dest, objectives):
                     # configuration is found, so return the board.
                     if move == dest:
                         board.nets[objectives[0]] = new_path
-                        # draw3d(bord1)
-                        # print("found path: ")
-                        # print(new_path)
-                        # print("")
 
                         if len(objectives) > 1:
                             new_objective = objectives[1]
@@ -100,6 +96,7 @@ def get_origin(path):
         return False
 
 
+
 # The execution of the solve
 # First read data of chip-print and netlist
 # Then start timing and execute solve
@@ -107,6 +104,8 @@ def get_origin(path):
 gates, gatelocations, netlist = read_data(chip_number, netlist_number)
 
 chip_board = board(gates, gatelocations)
+# sort netlist
+# netlist = sort_netlist_center(chip_board, netlist)
 
 start_time = time.time()
 make_net(chip_board, 
