@@ -1,6 +1,6 @@
 from helper_functions import gate
 from move_functions.move_helper_functions import *
-import time
+
 
 # Returns possible moves that can be taken from end of path.
 # Illegal moves are: 

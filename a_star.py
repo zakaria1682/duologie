@@ -5,17 +5,10 @@ from helper_functions import *
 from move_functions.move_nodes import *
 from classes import *
 
-# print('Number of arguments:', len(sys.argv), 'arguments.')
-# print('Argument List:', str(sys.argv))
 
 
 chip_number = sys.argv[1]
 netlist_number = sys.argv[2]
-
-
-
-
-
 
 
 
@@ -82,7 +75,6 @@ def make_net(board, start, goal):
                     if already_added == False:
                         options.append(new_option)
 
-    print("options ran out....")
     return False
 
 
@@ -93,9 +85,6 @@ def solve_board(board, netlist):
     for objective in netlist:
         net = make_net(board, gates[objective[0]], gates[objective[1]])
         board.nets[objective] = net
-
-
-
 
 
 
@@ -121,6 +110,4 @@ csvfile.write(str(execution_time))
 csvfile.close()
 
 
-
-# get_board_statistics(bord1)
 
