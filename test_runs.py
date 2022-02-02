@@ -62,7 +62,6 @@ with open('output/output.csv') as f:
     for line in lines:
         line2 = line.split(",")
         execution_times.append(float(line2[0].strip()))
-        print("line2", line2[2])
         cost.append(line2[2])
 
         line3 = line2[1].split("/")
