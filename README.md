@@ -1,15 +1,33 @@
 
 # Chips & Circuits 
 
-The assignment is to implement all nets in all netlists at minimum cost.
-A few steps to pave the way towards a program:
+In deze repository staat code om het Chips an Circuits probleem op te lossen. In het Chips & Circuits
+probleem is het de bedoeling dat er <i>nets</i> worden gemaakt tussen <i>gates</i> op een <i>chip-print</i>.
+De gegeven informatie om een probleem in het Chips & Circuits format op te kunnen lossen is:
+<ul>
+  <li>Een <i>print</i>, oftewel een verzameling genummerde <i>gates</i>, elk met een stel coördinaten.</li>
+  <li>Een netlist: een verzameling duo's van integers, waarvan elke integer een gate voorsteld. Het duo
+      representeert een connectie die gemaakt moet worden op de chip-print tussen de twee gates in het duo.</li>
+</ul>
 
-<ol>
-  <li>Build a computer program that holds a data structure for a grid with fixed gates.</li>
-  <li>Expand your program by making a data structure for a netlist. Make sure it holds a few nets, and that the program has a cost function to calculate the total wire length.</li>
-  <li>Add 7 more layers by stacking them on top of the base layer. Try to get as many as possible of the nets in. You can either build up wire-by-wire, or remove collisions one by one. Do not worry if you can not fit all of them initially; it is still possible to measure performance by the percentage of nets that you have been able to fit in with a specific algorithm.</li>
-  <li>Try to get all the nets in with minimal costs. Record all your results, so you can present them later.</li>
-</ol>
+<br>
+
+Een complete en correcte oplossing zorgt ervoor dat elke gevraagde connectie in de netlist succesvol is gemaakt
+op het bord. Echter gaat Chips & Circuits verder dan alleen het vinden van een correcte oplossing. Het is ook
+een optimalisatieprobleem. Elk stukje wire draagt een cost (van 1) met zich mee en het is de bedoeling om een
+configuratie te vinden met een zo klein mogelijke cost.<br>
+Daarnaast geldt ook dat er geen overlap mag plaatsvinden. Is er meer dan één wire aanwezig op een enkel bord-segment,
+dan is de oplossing ongeldig. Intersectie, dus alleen het kruisen van nets, is wel toegestaan maar is duur. Elke
+intersectie op een bord met nets verhoogd de kosten van die configuratie met 300.<br><br>
+De totale cost van een bepaalde configuratie kan worden berekend met de volgende formule:<br>
+
+<p style="font-family:arial">C = n + 300 * k<p><br>
+
+Waar C de totale cost is, n het aantal wires en k het aantal intersecties.
+
+
+
+
 
 ## Instructies voor het gebruik van test_runs (het ophalen van de resultaten)
 
@@ -24,7 +42,7 @@ waarbij:
          De opties in dit geval zijn: random_solve.py, BFS.py & a_star.py
          </li>
   <li><b>n</b>: Netlist. Hier hoort het nummer van de netlist waar het algoritme op getest moet worden.
-         test_runs.py bepaalt automatisch welke chip-print hierbij hoort.<br>
+         test_runs.py bepaalt automatisch welke chip-print hierbij hoort<br>
          Hier kan worden gekozen voor een getal (int) tussen 1 & 9
          </li>
   <li><b>tt</b>: Total Time: Hier hoort de totale tijd waarin het algoritme herhaaldelijk uitgevoert moet worden.
