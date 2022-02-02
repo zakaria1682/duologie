@@ -105,7 +105,7 @@ gates, gatelocations, netlist = read_data(chip_number, netlist_number)
 
 chip_board = board(gates, gatelocations)
 # sort netlist
-# netlist = sort_netlist_center(chip_board, netlist)
+netlist = sort_netlist_center(chip_board, netlist)
 
 start_time = time.time()
 make_net(chip_board, 
