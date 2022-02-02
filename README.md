@@ -21,7 +21,7 @@ dan is de oplossing ongeldig. Intersectie, dus alleen het kruisen van nets, is w
 intersectie op een bord met nets verhoogd de kosten van die configuratie met 300.<br><br>
 De totale cost van een bepaalde configuratie kan worden berekend met de volgende formule:<br>
 
-<p style="font-family:arial">C = n + 300 * k<p><br>
+<p style="font-family:arial">C = n + 300 * k<p>
 
 Waar C de totale cost is, n het aantal wires en k het aantal intersecties.
 
@@ -36,7 +36,7 @@ De representatie van de case in deze repository bestaat ten eerste uit een bord:
 Gates en hun locaties zijn statisch per input, dus deze zijn ook onderdeel van het bord.
 <br>
 
-Paden zijn in dit geval een verzameling van coördinaten die opeenvolgend leiden tot het eindpunt. Paden bevatten wires en een cost (namelijk de hoeveelheid wires), maar er is voor gekozen om paden en/of nets niet een eigen klasse te geven aangezien de cost ook achteraf te berekenen is. Een pad/net is dan niets anders dan een verzameling coördinaten. Wel is het zo dat een chip-print een bepaalde verzameling van nets kan bevatten, bijvoorbeeld als deeloplossing. Om nets toegankelijk te houden, en ook per duo van gates toegang te hebben tot het bijbehorende net op een bord (als deze is gemaakt) worden nets in het bord opgeslagen door middel van een dictionary met als key een gate-duo en als value het bijbehorende net. Weet een algoritme een net niet te maken, dan komt er als value "False" te staan bij dat duo van gates in het bord wat wordt gebruikt.
+Paden zijn in dit geval een verzameling van coördinaten die opeenvolgend leiden tot het eindpunt. Paden bevatten wires en een cost (namelijk de hoeveelheid wires), maar er is voor gekozen om paden en/of nets niet een eigen klasse te geven aangezien de cost van een net-configuratie ook achteraf te berekenen is. Een pad/net is dan niets anders dan een verzameling coördinaten. Wel is het zo dat een chip-print een bepaalde verzameling van nets kan bevatten, bijvoorbeeld als deeloplossing. Om nets toegankelijk te houden, en ook per duo van gates toegang te hebben tot het bijbehorende net op een bord (als deze is gemaakt) worden nets in het bord opgeslagen door middel van een dictionary met als key een gate-duo en als value het bijbehorende net. Weet een algoritme een net niet te maken, dan komt er als value "False" te staan bij dat duo van gates in het bord wat wordt gebruikt.
 <br>
 
 Ten slotte is er een klasse toegevoegd voor nodes. Aangezien deze alleen relevant is voor het a-star algoritme wat in deze case is ontwikkeld, zullen nodes bij de beschrijving van a-star verder worden toegelicht.
@@ -45,45 +45,6 @@ Ten slotte is er een klasse toegevoegd voor nodes. Aangezien deze alleen relevan
 
 
 
-## Instructies voor het gebruik van test_runs (het ophalen van de resultaten)
-
-Door middel van test_runs.py kunnen de gemaakte algoritmes worden aangeroepen.
-Bij het aanroepen worden een aantal argumenten gevraagd die de uitkomst van de runs beïnvloeden.
-De argumenten zijn als volgt gestructureerd:
-
-<p style="font-family:arial">python3 test_runs.py a n tt tpr<p>
-waarbij:
-<ol>
-  <li><b>a</b>: Algorithm. Hier hoort de naam van de file met daarin het gewenste algoritme om getest te worden<br>
-         De opties in dit geval zijn: random_solve.py, BFS.py & a_star.py
-         </li>
-  <li><b>n</b>: Netlist. Hier hoort het nummer van de netlist waar het algoritme op getest moet worden.
-         test_runs.py bepaalt automatisch welke chip-print hierbij hoort<br>
-         Hier kan worden gekozen voor een getal (int) tussen 1 & 9
-         </li>
-  <li><b>tt</b>: Total Time: Hier hoort de totale tijd waarin het algoritme herhaaldelijk uitgevoert moet worden.
-                 (in aantal seconden in ints)</li>
-  <li><b>tpr</b>: Time Per Run: Hier hoort de maximale tijd die elke uitvoer van het algoritme heeft om tot één 
-                  oplossing te komen (in aantal seconden in ints)</li>
-</ol>
-
-Na het aanroepen van test_runs.py op deze manier zal het gegeven algoritme worden uitgevoerd voor tt seconden.
-test_runs.py roept het algoritme herhaaldelijk aan, en in het bestand van het algoritme wordt afhankelijk van
-welke netlist is gegeven het algoritme één maal uitgevoerd. Hierbij wordt de tijd gemeten die nodig is voor enkel
-en alleen het solven. Vervolgens worden statistieken van het bord verzameld.<br>
-
-De statistieken die worden verzameld:
-<ul>
-  <li>Excecution time per run</li>
-  <li>Hoeveelheid afgemaakte nets versus totale aantal nets</li>
-  <li>Cost van oplossing</li>
-</ul>
-
-Daarnaast wordt ook het beste geval van elk van deze statistieken verzameld,
-en de best gevonden oplossing (rekening houdend met elk van deze statistieken).<br>
-
-Elke individuele run van het algoritme zal worden aangekondigd door het printen van "run: " gevolgd door het nummer van de huidige run, en voor elke afgemaakte run zullen de bijbehorende statistieken per run op een nieuwe regel worden afgeschreven in output/output.csv. Enkele gemiddelden en de beste statistieken worden ook nog uitgeschreven naar
-stdout.
 
 
 
@@ -141,3 +102,43 @@ Wordt er een nieuwe node gemaakt, dan krijgt hij deze waarden toegewezen. De heu
 Soms (vaak) kan het gebeuren dat er naar een node wordt uitgebreid die al is bekeken door het algoritme. Is dit punt al bekeken, dan bestaat er in de ogen van het algoritme al een pad naar dit punt. Slechts 1 van de twee opties wordt bewaard, door de g-waarde (afstand van start tot dit punt) van de al bestaande node en de nieuwe node te vergelijken. Is de g-waarde van de node die al bestaat kleiner, dan bestaat er al een ander korter pad tot dat punt. Dat maakt het nieuwe pad tot dat punt overbodig, en deze wordt dan ook weggegooit. Deze keuze wordt gemaakt door te bepalen waar de node op dat punt naar wijst, ofwel wat hij als zijn parent beschouwt. <br>
 
 Ten slotte staat dit algoritme wel intersecties toe. Intersecties kosten 300 (ze verhogen de totale kosten van het bord met 300). Dit betekent dat een pad dat een intersectie maakt pas interessant is als er geen andere paden met een omweg korter dan 300 wires gemaakt kunnen worden. Hiervoor kan heel handig de g-waarde gebruikt worden. Maakt het algoritme een stap, dan is de g-waarde voor het nieuwe punt de g-waarde van zijn parent + 1 (één stap kost 1 in deze case). Maakt het algoritme echter een stap met een intersectie, dan wordt zijn g-waarde verhoogt met 300. Dit zorgt ervoor dat het uitbreiden van dit pad een flink verlaagde prioriteit heeft, en dat dit pad pas uitgebreid zal worden als andere opties meer dan 300 wires ver zijn.
+
+
+## Instructies voor het gebruik van test_runs (het ophalen van de resultaten)
+
+Door middel van test_runs.py kunnen de gemaakte algoritmes worden aangeroepen.
+Bij het aanroepen worden een aantal argumenten gevraagd die de uitkomst van de runs beïnvloeden.
+De argumenten zijn als volgt gestructureerd:
+
+<p style="font-family:arial">python3 test_runs.py a n tt tpr<p>
+waarbij:
+<ol>
+  <li><b>a</b>: Algorithm. Hier hoort de naam van de file met daarin het gewenste algoritme om getest te worden<br>
+         De opties in dit geval zijn: random_solve.py, BFS.py & a_star.py
+         </li>
+  <li><b>n</b>: Netlist. Hier hoort het nummer van de netlist waar het algoritme op getest moet worden.
+         test_runs.py bepaalt automatisch welke chip-print hierbij hoort<br>
+         Hier kan worden gekozen voor een getal (int) tussen 1 & 9
+         </li>
+  <li><b>tt</b>: Total Time: Hier hoort de totale tijd waarin het algoritme herhaaldelijk uitgevoert moet worden.
+                 (in aantal seconden in ints)</li>
+  <li><b>tpr</b>: Time Per Run: Hier hoort de maximale tijd die elke uitvoer van het algoritme heeft om tot één 
+                  oplossing te komen (in aantal seconden in ints)</li>
+</ol>
+
+Na het aanroepen van test_runs.py op deze manier zal het gegeven algoritme worden uitgevoerd voor tt seconden.
+test_runs.py roept het algoritme herhaaldelijk aan, en in het bestand van het algoritme wordt afhankelijk van
+welke netlist is gegeven het algoritme één maal uitgevoerd. Hierbij wordt de tijd gemeten die nodig is voor enkel
+en alleen het solven. Vervolgens worden statistieken van het bord verzameld.<br>
+
+De statistieken die worden verzameld:
+<ul>
+  <li>Excecution time per run</li>
+  <li>Hoeveelheid afgemaakte nets versus totale aantal nets</li>
+  <li>Cost van oplossing</li>
+</ul>
+
+Daarnaast wordt ook het beste geval van elk van deze statistieken verzameld..<br>
+
+Elke individuele run van het algoritme zal worden aangekondigd door het printen van "run: " gevolgd door het nummer van de huidige run, en voor elke afgemaakte run zullen de bijbehorende statistieken per run op een nieuwe regel worden afgeschreven in output/output_[gebruikte algoritme].csv. Enkele gemiddelden en de beste statistieken worden ook nog uitgeschreven naar
+stdout.
