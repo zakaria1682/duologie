@@ -12,26 +12,17 @@ print('Argument List:', str(sys.argv))
 chip_number = sys.argv[1]
 netlist_number = sys.argv[2]
 
-print("Reading chip ", chip_number, " and netlist ", netlist_number)
-
 
 # Preprocessing
 # Collect input data and create required structures.
 # Also the ordering of the netlist is decided.
 gates, gatelocations, netlist = read_data(chip_number, netlist_number)
-
-print("Netlist: ", netlist)
-print("Gates: ", gates)
-print("Gate locations: ", gatelocations)
-
 bord1 = board(gates, gatelocations)
 
-print("Bord breedte: ", bord1.width)
-print("Bord lengte: ", bord1.length)
-print("")
 
 # Netlist sorteren....
-netlist = sort_netlist_euc_dist(netlist, gates)
+# netlist = sort_netlist_euc_dist(netlist, gates)
+netlist = sort_netlist_center(bord1, netlist)
 print("\nNetlist na sorteren: ")
 print(netlist)
 
@@ -135,10 +126,9 @@ def solve_board(board, netlist):
 
 
 
-new_netlist = sort_netlist_center(bord1, netlist, gates)
 # print(new_netlist)
 
-solve_board(bord1, new_netlist)
+solve_board(bord1, netlist)
 # print("Gemaakte nets: ")
 # for net in bord1.nets:
 #     print("\n", net, "\n########################")
@@ -146,5 +136,5 @@ solve_board(bord1, new_netlist)
 draw3d(bord1)
 
 
-get_board_statistics(bord1, new_netlist)
+get_board_statistics(bord1)
 

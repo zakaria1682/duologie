@@ -94,13 +94,13 @@ def calc_board_middle(board):
 
 
 # Sort the netlist based on distance of gates to center of board
-def sort_netlist_center(board, netlist, gates):
+def sort_netlist_center(board, netlist):
     M = calc_board_middle(board)
 
     netlist.sort(key = lambda net: 
-          euclidian_distance(gates[net[0]], M)
-        + euclidian_distance(gates[net[1]], M)
-        + euclidian_distance(gates[net[0]], gates[net[1]])
+          euclidian_distance(board.gates[net[0]], M)
+        + euclidian_distance(board.gates[net[1]], M)
+        + euclidian_distance(board.gates[net[0]], board.gates[net[1]])
         )
 
     return netlist

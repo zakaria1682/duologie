@@ -100,48 +100,22 @@ def get_origin(path):
         return False
 
 
-# Function that gives a text output of a solution (board) as prescribed in
-# the assignment. 
-def output_board(board, netlist, chip_number, netlist_number):
-    # print("net,wires")
-    for net in netlist:
-
-        net_as_string = str(net).replace(" ", "")
-        # print("\"" + net_as_string + "\",\"", end = "")
-
-        # if net in board.nets:
-            # print(str(board.nets[net]).replace(" ", ""), end = '')
-        # print("\"")
-
-    # print("chip_" + str(chip_number) + "_net_" + str(netlist_number) + ","
-        # + str(board.cost))
-
-
-execution_times = []
+# The execution of the solve
+# First read data of chip-print and netlist
+# Then start timing and execute solve
+# Then write execution time to output.csv
 gates, gatelocations, netlist = read_data(chip_number, netlist_number)
-for i in range(0, 100):
-    print(i, "%")
-    start_time = time.time()
-    bord = board(gates, gatelocations)
-    make_net(bord, bord.gates[netlist[0][0]], bord.gates[netlist[0][1]], netlist)
-    exec_time = (time.time() - start_time)
-    execution_times.append(exec_time)
 
+chip_board = board(gates, gatelocations)
 
-print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-print("Average execution time: ")
-average_exec = average(execution_times)
-print(average_exec)
-print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n")
+start_time = time.time()
+make_net(chip_board, 
+         chip_board.gates[netlist[0][0]], 
+         chip_board.gates[netlist[0][1]], 
+         netlist)
+execution_time = (time.time() - start_time)
 
-
-
-
-# bord1 = board(gates, gatelocations)
-# random.shuffle(netlist)
-# start_time = time.time()
-# make_net(bord1, gates[netlist[0][0]], gates[netlist[0][1]], netlist)
-# draw3d(bord1)
-
-
-
+csvfile = open('output/output.csv', 'a')
+csvfile.write("\n")
+csvfile.write(str(execution_time))
+csvfile.close()
