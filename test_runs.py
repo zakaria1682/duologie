@@ -21,6 +21,7 @@ netlist_num = int(sys.argv[2])
 total_run_time = int(sys.argv[3])
 time_for_each_exec = int(sys.argv[4])
 
+
 if netlist_num < 4:
     chip_num = 0
 elif netlist_num < 7:

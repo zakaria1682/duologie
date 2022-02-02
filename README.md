@@ -10,3 +10,12 @@ A few steps to pave the way towards a program:
   <li>Add 7 more layers by stacking them on top of the base layer. Try to get as many as possible of the nets in. You can either build up wire-by-wire, or remove collisions one by one. Do not worry if you can not fit all of them initially; it is still possible to measure performance by the percentage of nets that you have been able to fit in with a specific algorithm.</li>
   <li>Try to get all the nets in with minimal costs. Record all your results, so you can present them later.</li>
 </ol>
+
+## Instructies voor het gebruik van test_runs (het ophalen van de resultaten)
+
+Door middel van test_runs.py kunnen de gemaakte algoritmes worden aangeroepen.
+Bij het aanroepen worden een aantal argumenten gevraagd die de uitkomst van de runs beïnvloeden.
+De argumenten zijn als volgt gestructureerd:
+
+<p style="font-family:arial">python test_runs.py<p>
+<ol>

@@ -113,6 +113,8 @@ start_time = time.time()
 solve_board(chip_board, netlist)
 execution_time = (time.time() - start_time)
 
+
+
 csvfile = open('output/output.csv', 'a')
 csvfile.write("\n")
 csvfile.write(str(execution_time))
