@@ -9,8 +9,8 @@ from classes import *
 
 
 
-chip_number = 0
-netlist_number = 1
+chip_number = 1
+netlist_number = 5
 
 
 # Preprocessing
@@ -39,9 +39,12 @@ print(netlist)
 # as a heuristic. Introduce nodes as a way to traverse spaces on the chip print
 # so no entire paths have to be kept in memory.
 def make_net(board, start, goal):
-    # print("Finding path from ", start, " to ", goal, "...")
+    print("Finding path from ", start, " to ", goal, "...")
+    print("************************8")
     gatelocations_except_goal = set()
     gatelocations_except_goal = (board.gatelocations - set([goal]))
+    # gatelocations_except_goal = ((board.gatelocations).difference(set([goal])))
+
     starting_node = node(start, None)
 
     # List containing all possible locations to be moved from.
@@ -58,6 +61,7 @@ def make_net(board, start, goal):
         #     for opt in options:
         #         print(opt.location, opt.f)
         current = options.pop()
+
         seen.append(current.location)
 
         # Check to see if goal is found.
@@ -68,7 +72,7 @@ def make_net(board, start, goal):
 
         # print("Walking ", current.location)
         # Get legal moves from current position.
-        moves = get_moves(board, current, gatelocations_except_goal, goal)
+        moves = get_moves(board, current, gatelocations_except_goal, goal, start)
 
         # For each legal move make a new node and set its scores accordingly.
         # g = distance to node (distance to parent + 1)
@@ -77,10 +81,13 @@ def make_net(board, start, goal):
         for move in moves:
             if move != False :
                 if move[0] not in seen:
+                    
                     new_option = node(move[0], parent = current)
                     new_option.g = current.g + move[1]
                     new_option.h = euc_3d(move[0], goal)
+                    # new_option.h = manhattan_distance3d(move[0], goal)
                     new_option.f = new_option.g + new_option.h
+
                     if move[1] == 300:
                         new_option.intersection = True
 
@@ -135,29 +142,36 @@ def solve_board(board, netlist):
 
 
 
-execution_times = []
+# execution_times = []
 
 
 
-for i in range(0, 100):
-    print(i, "%")
-    start_time = time.time()
+# for i in range(0, 100):
+#     print(i, "%")
+#     start_time = time.time()
 
-    bord = board(gates, gatelocations)
-    solve_board(bord, netlist)
+#     bord = board(gates, gatelocations)
+#     solve_board(bord, netlist)
 
-    exec_time = (time.time() - start_time)
+#     exec_time = (time.time() - start_time)
 
-    execution_times.append(exec_time)
-
-
-print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n")
-print("Average execution time: ")
-average_exec = average(execution_times)
-print(average_exec)
-print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n")
+#     execution_times.append(exec_time)
 
 
-solve_board(bord1, netlist)
-draw3d(bord1, gates, netlist)
+# print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n")
+# print("Average execution time: ")
+# average_exec = average(execution_times)
+# print(average_exec)
+# print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n")
 
+
+
+new_netlist = sort_netlist_center(bord1, netlist, gates)
+print(new_netlist)
+
+solve_board(bord1, new_netlist)
+print("Gemaakte nets: ")
+for net in bord1.nets:
+    print("\n", net, "\n########################")
+    print(bord1.nets[net])
+draw3d(bord1)

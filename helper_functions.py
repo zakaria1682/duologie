@@ -87,6 +87,28 @@ def sort_netlist_euc_dist(netlist, gates):
 
 
 
+def calc_board_middle(board):
+    x = (board.length - 1)/2
+    y = (board.width - 1)/2
+    return (x, y, 0)
+
+
+
+# Sort the netlist based on distance of gates to center of board
+def sort_netlist_center(board, netlist, gates):
+    M = calc_board_middle(board)
+    print(M)
+
+    netlist.sort(key = lambda net: 
+          euclidian_distance(gates[net[0]], M)
+        + euclidian_distance(gates[net[1]], M)
+        + euclidian_distance(gates[net[0]], gates[net[1]])
+        )
+
+    return netlist
+
+
+
 # Return the average value of a list
 def average(lst):
     return sum(lst) / len(lst)

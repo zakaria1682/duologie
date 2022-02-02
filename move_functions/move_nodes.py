@@ -1,4 +1,6 @@
 from helper_functions import gate
+from move_functions.move_helper_functions import *
+import time
 
 # Returns possible moves that can be taken from end of path.
 # Illegal moves are: 
@@ -8,44 +10,24 @@ from helper_functions import gate
 #   Moves that result in the location of a gate that is not the goal gate
 # Also, if a move results in an already visited location by other nets on board,
 # give that move a higher cost to reduce it's priority.
-def get_moves(board, current_node, gatelocations_except_goal, goal):
-    # print("")
-    cur_location = current_node.location
-    # print("Getting moves from location ", cur_location)
+def get_moves(board, current_node, gatelocations_except_goal, goal, start):
+    cur_location = current_node.location    
+        
+    moves = return_directions(cur_location, board)
+    # Add basic cost of 1 to moves
+    moves = [(x, 1) if x != False else x for x in moves]
 
-    north = ((cur_location[0], cur_location[1] + 1, cur_location[2]), 1)
-    east = ((cur_location[0] + 1, cur_location[1], cur_location[2]), 1)
-    south = ((cur_location[0], cur_location[1] - 1, cur_location[2]), 1)
-    west = ((cur_location[0] - 1, cur_location[1], cur_location[2]), 1)
-    up = ((cur_location[0], cur_location[1], cur_location[2] + 1), 1)
-    down = ((cur_location[0], cur_location[1], cur_location[2] - 1), 1)
+    # if start == (11, 4, 0) and goal == (2, 2, 0):
+    #     # time.sleep(0.5)
+    #     print("Mogelijke moves: ", moves)
 
-    if cur_location[1] >= board.length - 1:
-        north = False
-
-    if cur_location[0] >= (board.width - 1):
-        east = False 
-    
-    if cur_location[1] <= 0:
-        south = False
-
-    if cur_location[0] <= 0:
-        west = False
-
-    if cur_location[2] >= (board.height - 1):
-        up = False
-
-    if cur_location[2] <= 0:
-        down = False
-
-    moves = [north, east, south, west, up, down]
 
     # Prevent move from going towards a gate that is not its objective
     for i in range(0, len(moves)):
         if moves[i] != False:
             if moves[i][0] in gatelocations_except_goal:
-                moves[i] == False
-    
+                moves[i] = False
+                
     # Prevent moves from going backwards (towards their parent)
     if current_node.parent != None:
         for i in range(0, len(moves)):
@@ -80,6 +62,7 @@ def get_moves(board, current_node, gatelocations_except_goal, goal):
                             and moves[i][0] in ends_of_net):
                             moves[i] = False
                         elif not b_is_gate:
+                            # update move cost to 300, since intersection
                             moves[i] = (moves[i][0], 300)
                     elif current_node.intersection == True:
                         # overlap

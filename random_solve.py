@@ -7,7 +7,7 @@ import time
 
 
 chip_number = 0
-netlist_number = 2
+netlist_number = 1
 
 # Preprocessing
 # Collect input data and create required structures.
@@ -27,23 +27,24 @@ print("")
 
 
 
-
-def make_random_net(board, objective):
+# This function attemps to make a random path from a gate to another gate
+# (objective[0] to objective[1]) by repeatedly making random moves until the
+# goal is reached.
+# If the function has not made a path after "tries" attempts, return False.
+def make_random_net(board, objective, tries):
     start = board.gates[objective[0]]
     goal = board.gates[objective[1]]
-    # print("Objective: ", objective)
-    # print("Make net from ", start, " to ", goal, "...")
-    # time.sleep(2)
 
     path = [start]
-    impassable_terrain = gates_and_surroundings(board, objective)
+    # impassable terrain represents positions of nets already present on the
+    # board and neighbors of gates to prevent nets from moving close to gates
+    # that are not their objective.
+    occupied = impassable_terrain(board, objective)
     
     net_made = False
-    # i = 0
-    while net_made == False:
-        # print(path)
-
-        move = get_random_move(board, path, goal, objective, impassable_terrain)
+    i = 0
+    while net_made == False and i < tries:
+        move = get_random_move(board, path, goal, objective, occupied)
 
         if move != False:
             path = path + [move]
@@ -51,55 +52,39 @@ def make_random_net(board, objective):
             path = [start]
 
         if move == goal:
-            # print("\nFound path to ", goal)
-            # print(" : ", path)
             return path
 
-        # Amount of tries allowed. If function has not found net before,
-        # return False.
-        # i+=1
-        # if i > 120:
-        #     return False
+        i += 1
+
+    return False
 
 
 
-
-test_net = [(1, 2, 0), (2, 2, 0), (2, 3, 0), (2, 4, 0)]
-bord1.nets[(1, 2)] = test_net
-test_net2 = [(4, 4, 1), (4, 4, 2), (4, 4, 3), (4, 4, 4)]
-bord1.nets[(3, 5)] = test_net2
-
-
-
+# Solve a board by repeatedly making random nets for the required gate
+# connections. The algorithm allows the net making function "tries" attemps to
+# make a net.
+# If the net fails to be made, erase the nets from the board and try again.
 def solve_board_random(board, netlist, tries):
-    for i in range(0, len(netlist)):
-        print(netlist[i])
-
-        j = 0
+    netlist_counter = 0
+    while netlist_counter < len(netlist):
+        
         made_net = False
-        while made_net == False and j < tries:
-            net = make_random_net(board, netlist[i])
-
-            if net != False:
-                print("Found path ", net)
-                # time.sleep(0.3)
-                board.nets[netlist[i]] = net
-                made_net = True
+        while made_net == False:
+            net = make_random_net(board, netlist[netlist_counter], tries)
+            # print(netlist_counter)
             
-            j += 1
-
-        # If function fails after "tries" tries, remove last made net (if it
-        # it exists) and try to make last net again
-        if j >= tries:
-            if i > 0 and netlist[i - 1] in board.nets:
-                del board.nets[netlist[i - 1]]
-            i -= 1
-
+            if net != False:
+                board.nets[netlist[netlist_counter]] = net
+                made_net = True
+                netlist_counter += 1
+            else:
+                board.nets = dict()
+                netlist_counter = 0
 
 
 
 
-# solve_board_random(bord1, netlist, 60)
+solve_board_random(bord1, netlist, 16000)
 
 print("\nBoard nets: \n", bord1.nets)
 
@@ -108,4 +93,4 @@ occ = used_locations(bord1)
 
 
 
-# draw3d(bord1)
+draw3d(bord1)

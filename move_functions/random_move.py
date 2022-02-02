@@ -2,6 +2,8 @@ import random
 from move_functions.move_helper_functions import *
 import time
 
+
+
 # Returns possible moves that can be taken from end of path.
 # For each cardinal direction, refuse to generate move if that direction is
 # the source of the last move taken (to prevent moving back), and refuse to
@@ -16,22 +18,20 @@ def get_random_move(board, path, goal, objective, impassable_terrain):
         if move == goal:
             return move
 
-    # Prevent path from entering gates and their surroundings
-    # except start and goal
+    # Prevent path from moving to coordinates
+    # it has already visited,
+    # that belong to gates and their neigbours,
+    # that are occupied by nets already present on board
     illegal = set(path).union(impassable_terrain)
-
-    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!Prevendeer intersectie!!!
     
-
-
     # prevent path from visiting non-legal coordinates
     for i in range(0, len(moves)):
         if moves[i] in illegal:
-            # print("coord ", coord, "already visited")
             moves[i] = False
     
     leftover_moves = [x for x in moves if x != False]
 
+    # Randomly select one of the found legal moves
     if leftover_moves:
         return random.choice(leftover_moves)
     else:
