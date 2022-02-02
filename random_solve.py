@@ -84,7 +84,12 @@ start_time = time.time()
 solve_board_random(chip_board, netlist, 10000)
 execution_time = (time.time() - start_time)
 
-csvfile = open('output/output.csv', 'a')
+statistics = get_board_statistics(chip_board)
+
+
+csvfile = open('output/output_random_solve.csv', 'a')
 csvfile.write("\n")
-csvfile.write(str(execution_time))
+string = str(statistics[0]) + "/" + str(len(netlist))
+csvfile.write(f"{execution_time},{string},{statistics[1]}")
+ 
 csvfile.close()

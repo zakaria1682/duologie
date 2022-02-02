@@ -74,5 +74,9 @@ stdout.
 
 # Beschrijving van de algoritmen
 
-## Breadth-first search (BFS)
+## Breadth-first search (BFS) algoritme
 Het BFS algoritme is een zoekalgoritme dat vanaf een beginpunt kijkt bij elke vertakking of het de oplossing is en vervolgens voor elk van die vertakkingen dit proces uitvoert totdat de gewenste oplossing gevonden is. Het zoek algoritme breidt op deze manieer alle mogelijkheden van paden uit in alle vertakkings richtingen en slaat deze paden op totdat het einddoel is bereikt. Het algoritme houd er rekening mee dat paden elkaar niet kruizen en er dus ook geen overlap van paden kan ontstaan. Tevens kunnen paden niet over gates heen lopen. Verder gebruikt dit zoek algoritme geen informatie over het zoekprobleem tijdens het zoeken.
+
+## Random algoritme
+Het random algoritme is een zoekalgoritme dat vanaf een beginpunt random in de diepte elke keer 1 vertakking onderzoekt en vervolgens hierna voor die vertakking ook 1 vertakking onderzoekt. Het algoritme kiest een tak en doorzoekt deze dus zo ver mogelijk, zonder terug te keren op vorige stappen.  Als het algoritme vastloopt worden alle paden verwijdert en begint het algoritme weer vanaf het startpunt. Het algoritme houd er rekening mee dat paden elkaar niet kruizen en er dus ook geen overlap van paden kan ontstaan. Tevens kunnen paden niet over gates heen lopen.
+Er is gekozen om alle paden te verwijderen bij het vastlopen omdat in de helft van de gevallen een pad verwijderen en weer opnieuw aanleggen weer resulteerde in het vastlopen van het algortime. Opnieuw bginnen heeft een hogere kans van slagen. 

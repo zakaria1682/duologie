@@ -105,7 +105,7 @@ gates, gatelocations, netlist = read_data(chip_number, netlist_number)
 
 chip_board = board(gates, gatelocations)
 # sort netlist
-netlist = sort_netlist_center(chip_board, netlist)
+# netlist = sort_netlist_center(chip_board, netlist)
 
 start_time = time.time()
 make_net(chip_board, 
@@ -116,12 +116,11 @@ execution_time = (time.time() - start_time)
 statistics = get_board_statistics(chip_board)
 
 
-csvfile = open('output/output.csv', 'a')
+csvfile = open('output/output_BFS.csv', 'a')
 csvfile.write("\n")
-# csvfile.write(str(execution_time))
 string = str(statistics[0]) + "/" + str(len(netlist))
 csvfile.write(f"{execution_time},{string},{statistics[1]}")
-
+ 
 csvfile.close()
 
 

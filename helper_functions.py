@@ -1,4 +1,3 @@
-import matplotlib
 import numpy as np
 from matplotlib import pyplot as plt
 import mpl_toolkits.mplot3d.art3d as art3d
