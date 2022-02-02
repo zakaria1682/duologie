@@ -1,7 +1,12 @@
 from helper_functions import *
 import time
 import subprocess
+import os
+import pandas as pd
 
+
+df = pd.DataFrame(list())
+df.to_csv('execution_times.csv')
 
 n_runs = 0
 execution_times = []
@@ -21,3 +26,5 @@ print("Average execution time: ")
 average_exec = average(execution_times)
 print(average_exec)
 print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n")
+
+os.remove('execution_times.csv')
