@@ -82,10 +82,7 @@ De statistieken die worden verzameld:
 Daarnaast wordt ook het beste geval van elk van deze statistieken verzameld,
 en de best gevonden oplossing (rekening houdend met elk van deze statistieken).<br>
 
-Elke individuele run van het algoritme zal worden aangekondigd door het printen van "run: " gevolgd door
-het nummer van de huidige run, en voor elke afgemaakte run zullen de bijbehorende statistieken per run
-op een nieuwe regel worden afgeschreven in output/output.csv.
-Enkele gemiddelden en de beste statistieken worden ook nog uitgeschreven naar
+Elke individuele run van het algoritme zal worden aangekondigd door het printen van "run: " gevolgd door het nummer van de huidige run, en voor elke afgemaakte run zullen de bijbehorende statistieken per run op een nieuwe regel worden afgeschreven in output/output.csv. Enkele gemiddelden en de beste statistieken worden ook nog uitgeschreven naar
 stdout.
 
 
@@ -124,3 +121,23 @@ Het BFS algoritme is een zoekalgoritme dat vanaf een beginpunt kijkt bij elke ve
 ## Random algoritme
 Het random algoritme is een zoekalgoritme dat vanaf een beginpunt random in de diepte elke keer 1 vertakking onderzoekt en vervolgens hierna voor die vertakking ook 1 vertakking onderzoekt. Het algoritme kiest een tak en doorzoekt deze dus zo ver mogelijk, zonder terug te keren op vorige stappen. Als het algoritme vastloopt worden alle paden verwijdert en begint het algoritme weer vanaf het startpunt. Het algoritme houd er rekening mee dat paden elkaar niet kruizen en er dus ook geen overlap van paden kan ontstaan. Tevens kunnen paden niet over gates heen lopen.
 Er is gekozen om alle paden te verwijderen bij het vastlopen omdat in de helft van de gevallen een pad verwijderen en weer opnieuw aanleggen weer resulteerde in het vastlopen van het algortime. Opnieuw beginnen heeft een hogere kans van slagen. 
+
+## A-star algoritme
+Het A-star algoritme maakt nets door alleen de meest veelbelovende paden uit te breiden vanaf het startpunt. 
+Op elke stap wordt in elke richting gekeken. Vervolgens worden er voor elk van de locaties waar naartoe bewogen kan worden een <i>node</i> gemaakt, een datastructuur die het algoritme in staat stelt een soort kaart te maken van zijn omgeving.<br>
+Een node bevat een aantal dingen:
+
+<ul>
+  <li>De coordinaten van zijn eigen locatie</li>
+  <li>De locatie van de node van waar er naar deze node is uitgebreid (oftewel zijn "parent")</li>
+  <li>een "g"-waarde. Deze representeerd de afstand van het startpunt <i>tot</i> deze node </li>
+  <li>een "h"-waarde. Deze representeert de afstand van deze locatie <i>tot</i> het eindpunt</li>
+  <li>een "f"-waard. Deze representeert de optelsom van de bovenste twee waarden</li>
+  <li>Een boolean genaamd <i>intersection</i> die vertelt of er op dit punt een intersectie heeft plaatsgevonden</li>
+</ul>
+
+Wordt er een nieuwe node gemaakt, dan krijgt hij deze waarden toegewezen. De heuristic "h" is te bepalen met euclidian afstand tot het eindpunt en manhattan afstand tot het eindpunt. Welke van de twee tot efficientere uitkomsten leidt verschilt per oplossing. Vervolgens, als het algoritme zijn volgende stap gaat zetten, wordt de keuze van welke node wordt uitgebreid bepaald door de f-waarde. Dit representeert het meest veelbelovende pad, omdat dit punt het dichtst is bij het startpunt, en het dichtst bij het eindpunt, en dus veelbelovend is voor het leveren van een zo kort mogelijk pad vergeleken met de andere opties. Zo wordt het algoritme gestuurd om moves te maken richting het eindpunt. Als het eindpunt wordt bereikt wordt er opeenvolgend gekeken naar parents van nodes tot het startpuntn wordt bereikt, en zo volgt er een pad. Op deze manier hoeven er ook geen onvolledige paden begehouden te worden in het geheugen.<br>
+
+Soms (vaak) kan het gebeuren dat er naar een node wordt uitgebreid die al is bekeken door het algoritme. Is dit punt al bekeken, dan bestaat er in de ogen van het algoritme al een pad naar dit punt. Slechts 1 van de twee opties wordt bewaard, door de g-waarde (afstand van start tot dit punt) van de al bestaande node en de nieuwe node te vergelijken. Is de g-waarde van de node die al bestaat kleiner, dan bestaat er al een ander korter pad tot dat punt. Dat maakt het nieuwe pad tot dat punt overbodig, en deze wordt dan ook weggegooit. Deze keuze wordt gemaakt door te bepalen waar de node op dat punt naar wijst, ofwel wat hij als zijn parent beschouwt. <br>
+
+Ten slotte staat dit algoritme wel intersecties toe. Intersecties kosten 300 (ze verhogen de totale kosten van het bord met 300). Dit betekent dat een pad dat een intersectie maakt pas interessant is als er geen andere paden met een omweg korter dan 300 wires gemaakt kunnen worden. Hiervoor kan heel handig de g-waarde gebruikt worden. Maakt het algoritme een stap, dan is de g-waarde voor het nieuwe punt de g-waarde van zijn parent + 1 (één stap kost 1 in deze case). Maakt het algoritme echter een stap met een intersectie, dan wordt zijn g-waarde verhoogt met 300. Dit zorgt ervoor dat het uitbreiden van dit pad een flink verlaagde prioriteit heeft, en dat dit pad pas uitgebreid zal worden als andere opties meer dan 300 wires ver zijn.
