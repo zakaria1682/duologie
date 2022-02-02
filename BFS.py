@@ -1,7 +1,4 @@
 import sys
-# import numpy as np
-# import random
-# import csv
 import time
 
 from helper_functions import *

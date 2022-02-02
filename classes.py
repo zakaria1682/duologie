@@ -21,11 +21,6 @@ class board:
         self.nets = {}
         self.cost = 0
 
-class path:
-    def __init__(self, nodes, score):
-        self.nodes = nodes
-        self.score = score
-
 class node:
     def __init__(self, location, parent):
         self.location = location
