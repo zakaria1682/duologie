@@ -28,7 +28,7 @@ else:
     chip_num = 2
 
 
-csvfile = open('output/output.csv', 'w')
+csvfile = open(f"output/output_{algorithm[:-3]}.csv", 'w')
 csvfile.write("Resultaten:" " Nets/Total nets:" " Total cost:")
 csvfile.close()
 
@@ -51,7 +51,7 @@ while time.time() - start_time < total_run_time:
 runs = []
 cost = []
 # open csv file 
-with open('output/output.csv') as f:
+with open(f"output/output_{algorithm[:-3]}.csv") as f:
     # Skip first line
     next(f)
     lines = f.readlines()
@@ -86,7 +86,7 @@ cost = list(map(int, cost))
 cost.sort()
 
 
-csvfile = open('output/output.csv', 'a')
+csvfile = open(f"output/output_{algorithm[:-3]}.csv", 'a')
 csvfile.write("\n")
 csvfile.write("\n")
 csvfile.write(f"Algorithm has completed {n_runs} runs  ")
