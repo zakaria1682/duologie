@@ -6,7 +6,7 @@ probleem is het de bedoeling dat er <i>nets</i> worden gemaakt tussen <i>gates</
 De gegeven informatie om een probleem in het Chips & Circuits format op te kunnen lossen is:
 <ul>
   <li>Een <i>print</i>, oftewel een verzameling genummerde <i>gates</i>, elk met een stel coördinaten.</li>
-  <li>Een netlist: een verzameling duo's van integers, waarvan elke integer een gate voorsteld. Het duo
+  <li>Een <i>netlist</i>: een verzameling duo's van integers, waarvan elke integer een gate voorsteld. Het duo
       representeert een connectie die gemaakt moet worden op de chip-print tussen de twee gates in het duo.</li>
 </ul>
 
@@ -24,6 +24,20 @@ De totale cost van een bepaalde configuratie kan worden berekend met de volgende
 <p style="font-family:arial">C = n + 300 * k<p><br>
 
 Waar C de totale cost is, n het aantal wires en k het aantal intersecties.
+
+## Classes
+
+De representatie van de case in deze repository bestaat ten eerste uit een bord: de chip-print. De dimensies van de chip-print worden bepaald door een rechthoek aan ruimte te maken waar de gegeven gates nog net in passen. Vervolgens voegen we aan deze ruimte nog één extra ring aan ruimte toe om de rechthoek heen door in de maximale x en y elk twee lengtes groter te maken. Passen de gates in een 4x5 rechthoek, dan is ons "speelveld" een rechthoek van 6x7. Daarnaast is het bord ook gelaagd, met nog zeven extra lagen bovenop de bodem. De hoeveelheid lagen is onafhankelijk van de input en is altijd acht. Dit resulteert in een 3d ruimte wat er voor zorgt dat nets ook in de hoogte kunnen uitbreiden, en dus over andere nets heen kunnen lopen om zo intersecties te voorkomen. 
+<br>
+
+Gates en hun locaties zijn statisch per input, dus deze zijn ook onderdeel van het bord.
+<br>
+
+Paden zijn in dit geval een verzameling van coördinaten die opeenvolgend leiden tot het eindpunt. Paden bevatten wires en een cost (namelijk de hoeveelheid wires), maar er is voor gekozen om paden en/of nets niet een eigen klasse te geven aangezien de cost ook achteraf te berekenen is. Een pad/net is dan niets anders dan een verzameling coördinaten. Wel is het zo dat een chip-print een bepaalde verzameling van nets kan bevatten, bijvoorbeeld als deeloplossing. Om nets toegankelijk te houden, en ook per duo van gates toegang te hebben tot het bijbehorende net op een bord (als deze is gemaakt) worden nets in het bord opgeslagen door middel van een dictionary met als key een gate-duo en als value het bijbehorende net. Weet een algoritme een net niet te maken, dan komt er als value "False" te staan bij dat duo van gates in het bord wat wordt gebruikt.
+<br>
+
+Ten slotte is er een klasse toegevoegd voor nodes. Aangezien deze alleen relevant is voor het a-star algoritme wat in deze case is ontwikkeld, zullen nodes bij de beschrijving van a-star verder worden toegelicht.
+<br>
 
 
 
