@@ -1,16 +1,18 @@
-# from audioop import avg
-# from queue import Empty
-# from sys import getallocatedblocks
 import time
+import sys
 
 from helper_functions import *
 from move_functions.move_nodes import *
 from classes import *
 
+print('Number of arguments:', len(sys.argv), 'arguments.')
+print('Argument List:', str(sys.argv))
 
 
-chip_number = 1
-netlist_number = 5
+chip_number = sys.argv[1]
+netlist_number = sys.argv[2]
+
+print("Reading chip ", chip_number, " and netlist ", netlist_number)
 
 
 # Preprocessing
@@ -39,8 +41,6 @@ print(netlist)
 # as a heuristic. Introduce nodes as a way to traverse spaces on the chip print
 # so no entire paths have to be kept in memory.
 def make_net(board, start, goal):
-    print("Finding path from ", start, " to ", goal, "...")
-    print("************************8")
     gatelocations_except_goal = set()
     gatelocations_except_goal = (board.gatelocations - set([goal]))
     # gatelocations_except_goal = ((board.gatelocations).difference(set([goal])))
@@ -54,23 +54,16 @@ def make_net(board, start, goal):
     while options:
         # extract the most promising path (lowest f score)
         options.sort(key = lambda location: location.f, reverse = True)
-
-        # if start == (1, 5) and goal == (6, 2):
-        #     time.sleep(0.5)
-        #     print("Sorted options")
-        #     for opt in options:
-        #         print(opt.location, opt.f)
         current = options.pop()
 
         seen.append(current.location)
 
-        # Check to see if goal is found.
+        # Check to see if goal is found. If true, trace path back to start.
         if current.location == goal:
             result = extract_path(current)
             
             return result
 
-        # print("Walking ", current.location)
         # Get legal moves from current position.
         moves = get_moves(board, current, gatelocations_except_goal, goal, start)
 
@@ -90,9 +83,6 @@ def make_net(board, start, goal):
 
                     if move[1] == 300:
                         new_option.intersection = True
-
-                    # print("Adding node ", new_option.location)
-                    # print("    parent = ", new_option.parent.location)
 
                     # Check if this option is already in in options.
                     # If it is already in options, a path to the coordinate already
@@ -114,37 +104,16 @@ def make_net(board, start, goal):
 
 
 
+# Function that solves given board by making a net for each requested connection
+# in netlist, and saves made nets in the nets dictionary of the board.
 def solve_board(board, netlist):
-    i = 0
     for objective in netlist:
-        # print("\nObjective: ", objective)
-        # print("#################################")
-        # print("Start: ", gates[objective[0]])
-        # print("Goal: ", gates[objective[1]])
-        # print("")
-
         net = make_net(board, gates[objective[0]], gates[objective[1]])
-        # print("Gevonden net: ")
-        # print(net)
-        # print("")
         board.nets[objective] = net
-
-        # draw3d(board, gates, netlist)
-        # time.sleep(0.3)  
-
-        i += 1
-        # if i > 2:
-        #     break
-
-
-
-
 
 
 
 # execution_times = []
-
-
 
 # for i in range(0, 100):
 #     print(i, "%")
@@ -167,11 +136,15 @@ def solve_board(board, netlist):
 
 
 new_netlist = sort_netlist_center(bord1, netlist, gates)
-print(new_netlist)
+# print(new_netlist)
 
 solve_board(bord1, new_netlist)
-print("Gemaakte nets: ")
-for net in bord1.nets:
-    print("\n", net, "\n########################")
-    print(bord1.nets[net])
+# print("Gemaakte nets: ")
+# for net in bord1.nets:
+#     print("\n", net, "\n########################")
+#     print(bord1.nets[net])
 draw3d(bord1)
+
+
+get_board_statistics(bord1, new_netlist)
+

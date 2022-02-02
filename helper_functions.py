@@ -36,9 +36,6 @@ def read_data(chip_number, netlist_number):
     netlist_filepath = "gates&netlists/chip_" + cn + "/netlist_" + nn + ".csv"
     with open(netlist_filepath) as input:
         netlist_data = [line for line in csv.reader(input)]
-    
-    print("Netlist data: ")
-    print(netlist_data)
 
     # Create tuples of requested connections in netlist data and prevent
     # empty read lines from being added to result netlist.
@@ -87,6 +84,8 @@ def sort_netlist_euc_dist(netlist, gates):
 
 
 
+# Function returns coordinates of actual center of the bottom layer of board
+# The coordinate does not have to contain just integers
 def calc_board_middle(board):
     x = (board.length - 1)/2
     y = (board.width - 1)/2
@@ -97,7 +96,6 @@ def calc_board_middle(board):
 # Sort the netlist based on distance of gates to center of board
 def sort_netlist_center(board, netlist, gates):
     M = calc_board_middle(board)
-    print(M)
 
     netlist.sort(key = lambda net: 
           euclidian_distance(gates[net[0]], M)
@@ -137,20 +135,50 @@ def gate(coord, gatelocations):
 
 
 
+# Function that returns the amount of made wires on a given board and counts
+# those wires to determine a cost of the board.
+# Wires (that are not on a gate) that make an intersection increase the cost
+# by 300.
+def get_board_statistics(board):
+    wire_dict = dict()
+    amount_of_nets = 0
+    cost = 0
+
+    for net in board.nets:
+        if board.nets[net] != False:
+            amount_of_nets += 1
+            cost += (len(board.nets[net]) - 1)
+            net_coordinates = board.nets[net]
+
+            for wire in net_coordinates:
+                if wire not in board.gatelocations:
+                    if wire in wire_dict:
+                        wire_dict[wire] += 1
+                    else:
+                        wire_dict[wire] = 1
+
+    # Account for intersections. Increase cost by 300 for each intersection
+    for item in wire_dict:
+        if wire_dict[item] > 1:
+            cost += (wire_dict[item] - 1) * 300
+
+    # print("Amount of nets: ", amount_of_nets, "/", len(netlist))
+    # print("Cost of this board configuration: ", cost)
+    return amount_of_nets, cost
+
+
+
 # function that graphically displays the nets of a solved chip-print
 def draw(board, gates, netlist):
     route = []
     net_dict = board.nets
-    # print("net_dict", net_dict)
     for i in range(len(net_dict)):
         route2 = []
-        # print(net_dict[netlist[i]])
         if net_dict[netlist[i]] != False:
             for j in range(len(net_dict[netlist[i]])):
                 route2.append(list(net_dict[netlist[i]][j]))
             route.append(route2)
     
-     
     # plot gates
     gates2 = []
     for i in range(len(gates)):

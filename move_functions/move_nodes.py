@@ -17,11 +17,6 @@ def get_moves(board, current_node, gatelocations_except_goal, goal, start):
     # Add basic cost of 1 to moves
     moves = [(x, 1) if x != False else x for x in moves]
 
-    # if start == (11, 4, 0) and goal == (2, 2, 0):
-    #     # time.sleep(0.5)
-    #     print("Mogelijke moves: ", moves)
-
-
     # Prevent move from going towards a gate that is not its objective
     for i in range(0, len(moves)):
         if moves[i] != False:
