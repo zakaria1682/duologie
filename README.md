@@ -120,8 +120,8 @@ waarbij:
          test_runs.py bepaalt automatisch welke chip-print hierbij hoort<br>
          Hier kan worden gekozen voor een getal (int) tussen 1 & 9
          </li>
-  <li><b>tt</b>: Total Time: Hier hoort de totale tijd waarin het algoritme herhaaldelijk uitgevoert moet worden.
-                 (in aantal seconden in ints)</li>
+  <li><b>tt</b>: Total Time: Hier hoort het aantal runs die uitgevoert moet worden.
+                 (aantal ints)</li>
   <li><b>tpr</b>: Time Per Run: Hier hoort de maximale tijd die elke uitvoer van het algoritme heeft om tot één 
                   oplossing te komen (in aantal seconden in ints)</li>
 </ol>
