@@ -28,9 +28,7 @@ def make_net(board, loc, dest, objectives):
             # backtracking and getting stuck in a loop.
             origin = get_origin(path)
             moves = get_moves(board, path, origin, occupied)
-            # print(moves[0])
         
-
             # For each spot found that can be moved to, add a new 
             # path (= old path + spot) to the collection of paths
             for move in moves:
@@ -103,7 +101,7 @@ gates, gatelocations, netlist = read_data(chip_number, netlist_number)
 chip_board = board(gates, gatelocations)
 # sort netlist
 # netlist = sort_netlist_center(chip_board, netlist)
-
+ 
 start_time = time.time()
 make_net(chip_board, 
          chip_board.gates[netlist[0][0]], 

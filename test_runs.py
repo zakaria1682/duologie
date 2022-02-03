@@ -17,7 +17,7 @@ if len(sys.argv) != 5:
 
 algorithm = sys.argv[1]
 netlist_num = int(sys.argv[2])
-total_run_time = int(sys.argv[3])
+total_runs = int(sys.argv[3])
 time_for_each_exec = int(sys.argv[4])
 
 if netlist_num < 4:
@@ -32,12 +32,12 @@ csvfile = open(f"output/output_{algorithm[:-3]}.csv", 'w')
 csvfile.write("Resultaten:" " Nets/Total nets:" " Total cost:")
 csvfile.close()
 
+
 n_runs = 1
 execution_times = []
 start_time = time.time()
- 
 # call the algorithm while time is under a certain limit
-while time.time() - start_time < total_run_time:
+while n_runs <= total_runs:
     print(f"run: {n_runs}")
     subprocess.call(["timeout", 
                      str(time_for_each_exec), 
@@ -48,6 +48,7 @@ while time.time() - start_time < total_run_time:
                      )
     n_runs += 1
 
+
 runs = []
 cost = []
 # open csv file 
@@ -55,8 +56,8 @@ with open(f"output/output_{algorithm[:-3]}.csv") as f:
     # Skip first line
     next(f)
     lines = f.readlines()
-    i = 1
-    j = 1
+    i = 0
+    j = 0
     # check several parameters like execution times, net completions and cost
     for line in lines:
         line2 = line.split(",")
@@ -89,7 +90,8 @@ cost.sort()
 csvfile = open(f"output/output_{algorithm[:-3]}.csv", 'a')
 csvfile.write("\n")
 csvfile.write("\n")
-csvfile.write(f"Algorithm has completed {n_runs} runs  ")
+n_runs = n_runs - 1
+csvfile.write(f"Algorithm has completed {n_runs} runs for chip {chip_num} netlist {netlist_num}  ")
 csvfile.write("\n")
 csvfile.write("Average execution time: ")
 csvfile.write(str(average_exec))
